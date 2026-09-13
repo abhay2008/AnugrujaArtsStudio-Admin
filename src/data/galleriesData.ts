@@ -1,0 +1,68 @@
+import { GalleryKey, GalleryMeta } from '@/lib/types';
+
+export const GALLERIES_META: GalleryMeta[] = [
+  {
+    key: 'sale',
+    label: 'Art for Sale',
+    description: 'Paintings catalog available for direct purchase & collector inquiries',
+    defaultCategory: 'Paintings for Sale',
+    iconName: 'ShoppingBag',
+    accentColor: 'from-amber-500/20 to-amber-700/10 text-amber-300 border-amber-500/30',
+  },
+  {
+    key: 'featured',
+    label: 'Featured Portfolio',
+    description: 'Spotlight gallery #one on the main landing page exhibiting studio masterpieces',
+    defaultCategory: 'Featured Collection',
+    iconName: 'Sparkles',
+    accentColor: 'from-yellow-500/20 to-yellow-700/10 text-yellow-300 border-yellow-500/30',
+  },
+  {
+    key: 'commission',
+    label: 'Commissioned Works',
+    description: 'Showcase of custom portraits, spiritual canvas, and heritage murals',
+    defaultCategory: 'Custom Commission',
+    iconName: 'Palette',
+    accentColor: 'from-purple-500/20 to-purple-700/10 text-purple-300 border-purple-500/30',
+  },
+  {
+    key: 'watercolor',
+    label: 'Watercolor Courses',
+    description: 'Masterclass and watercolor studies with wet-on-wet techniques',
+    defaultCategory: 'Watercolor Study',
+    iconName: 'Droplets',
+    accentColor: 'from-sky-500/20 to-sky-700/10 text-sky-300 border-sky-500/30',
+  },
+  {
+    key: 'classes',
+    label: 'Classes & Courses',
+    description: 'Student artworks and teaching milestone demonstrations',
+    defaultCategory: 'Student Work',
+    iconName: 'GraduationCap',
+    accentColor: 'from-emerald-500/20 to-emerald-700/10 text-emerald-300 border-emerald-500/30',
+  },
+  {
+    key: 'workshop',
+    label: 'Workshops & Exhibitions',
+    description: 'Corporate workshops, live plein-air camps, and art exhibitions',
+    defaultCategory: 'Exhibition',
+    iconName: 'Calendar',
+    accentColor: 'from-rose-500/20 to-rose-700/10 text-rose-300 border-rose-500/30',
+  },
+  {
+    key: 'testimonial',
+    label: 'Testimonials & Reviews',
+    description: 'Works produced by proud students and letters of appreciation',
+    defaultCategory: 'Student Work',
+    iconName: 'MessageSquareQuote',
+    accentColor: 'from-indigo-500/20 to-indigo-700/10 text-indigo-300 border-indigo-500/30',
+  },
+  {
+    key: 'achievement',
+    label: 'Achievements & Awards',
+    description: 'Kalakaar Foundation, State Gallery & Shiny Colours recognitions',
+    defaultCategory: 'Award Highlight',
+    iconName: 'Trophy',
+    accentColor: 'from-amber-400/20 to-yellow-600/10 text-amber-200 border-amber-400/30',
+  },
+];
