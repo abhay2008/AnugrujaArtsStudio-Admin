@@ -2,17 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---------------------------------------------------- */
+/* Self-hosted display fonts (shared with the main site) */
+/* ---------------------------------------------------- */
+@font-face {
+  font-family: 'Cinzel';
+  src: url('/fonts/cinzel-var.woff2') format('woff2');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cinzel Decorative';
+  src: url('/fonts/cinzel-decorative-700.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/fonts/playfair-var.woff2') format('woff2');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('/fonts/cormorant-garamond.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --foreground-rgb: 245, 245, 245;
-  --background-start-rgb: 20, 8, 26;
-  --background-end-rgb: 30, 13, 38;
+  --gold: #f2d770;
+  --gold-deep: #b8933a;
+  --ink: #f5efe4;
+  --ink-muted: rgba(233, 224, 208, 0.62);
+  --ink-faint: rgba(233, 224, 208, 0.38);
+  --panel: rgba(34, 16, 44, 0.66);
+  --panel-solid: #200e2a;
+  --hairline: rgba(242, 215, 112, 0.22);
+  --hairline-strong: rgba(242, 215, 112, 0.42);
+  --shadow-soft: 0 14px 40px -18px rgba(0, 0, 0, 0.55);
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: radial-gradient(circle at 50% 0%, #2b1233 0%, #14081a 70%, #0c0410 100%);
+  color: var(--ink);
+  background-color: #0d0512;
+  /* Atelier salon: obsidian base + champagne/amethyst ambient washes */
+  background-image:
+    radial-gradient(ellipse 62% 44% at 10% 6%, rgba(120, 74, 24, 0.2), transparent 60%),
+    radial-gradient(ellipse 55% 40% at 92% 12%, rgba(94, 44, 128, 0.22), transparent 58%),
+    radial-gradient(ellipse 48% 36% at 85% 88%, rgba(146, 92, 32, 0.14), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 50% -10%, rgba(110, 58, 150, 0.18), transparent 62%);
+  background-attachment: fixed;
   min-height: 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   overflow-x: hidden;
 }
 
@@ -32,7 +81,194 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #f2d770;
+  background: #b8933a;
+}
+
+::selection {
+  background: rgba(242, 215, 112, 0.28);
+  color: #fffdf5;
+}
+
+/* ================================================================
+   ATELIER DESIGN SYSTEM — shared component classes
+   ================================================================ */
+
+/* Frosted amethyst panel — the working surface of every page */
+.admin-panel {
+  background: var(--panel);
+  border: 1px solid var(--hairline);
+  border-radius: 1.25rem;
+  backdrop-filter: blur(14px) saturate(1.08);
+  -webkit-backdrop-filter: blur(14px) saturate(1.08);
+  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255, 251, 235, 0.05);
+}
+
+/* Hairline-framed glass card for metrics & tiles */
+.admin-card {
+  background: var(--panel);
+  border: 1px solid var(--hairline);
+  border-radius: 1.1rem;
+  backdrop-filter: blur(12px) saturate(1.05);
+  -webkit-backdrop-filter: blur(12px) saturate(1.05);
+  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255, 251, 235, 0.05);
+  transition: border-color 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.admin-card:hover {
+  border-color: var(--hairline-strong);
+  transform: translate3d(0, -2px, 0);
+  box-shadow: 0 20px 48px -18px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 251, 235, 0.07);
+}
+
+/* Section headings inside panels */
+.admin-title {
+  font-family: 'Cinzel', 'Trajan Pro', serif;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--gold);
+}
+
+/* Kicker / overline */
+.admin-kicker {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+}
+
+/* Primary gold action — molten foil */
+.admin-btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  color: #221204;
+  background: linear-gradient(160deg, #f7e494 0%, #e8c860 45%, #c49a2c 100%);
+  border: 1px solid rgba(255, 244, 200, 0.6);
+  box-shadow: 0 10px 26px -12px rgba(212, 175, 55, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+.admin-btn-gold:hover {
+  transform: translate3d(0, -1px, 0);
+  filter: brightness(1.05);
+  box-shadow: 0 14px 32px -12px rgba(212, 175, 55, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.admin-btn-gold:active {
+  transform: translate3d(0, 0, 0) scale(0.98);
+}
+
+/* Secondary quiet glass action */
+.admin-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--ink);
+  background: rgba(48, 24, 60, 0.55);
+  border: 1px solid var(--hairline);
+  transition: border-color 0.25s ease, background 0.25s ease, color 0.25s ease;
+}
+
+.admin-btn-ghost:hover {
+  border-color: var(--hairline-strong);
+  background: rgba(64, 34, 78, 0.55);
+  color: var(--gold);
+}
+
+/* Inputs & selects — inset velvet wells */
+.admin-input {
+  width: 100%;
+  border-radius: 0.7rem;
+  background: rgba(14, 6, 20, 0.55);
+  border: 1px solid var(--hairline);
+  color: var(--ink);
+  font-size: 0.82rem;
+  padding: 0.55rem 0.8rem;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.admin-input::placeholder {
+  color: var(--ink-faint);
+}
+
+.admin-input:focus {
+  outline: none;
+  border-color: rgba(242, 215, 112, 0.55);
+  background: rgba(20, 9, 28, 0.7);
+  box-shadow: 0 0 0 3px rgba(242, 215, 112, 0.12);
+}
+
+.admin-input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Form field label */
+.admin-label {
+  display: block;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 0.35rem;
+}
+
+/* Status pills */
+.admin-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.16rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid var(--hairline);
+  background: rgba(48, 24, 60, 0.5);
+  color: var(--ink-muted);
+}
+
+.admin-pill--gold {
+  color: var(--gold);
+  border-color: rgba(242, 215, 112, 0.4);
+  background: rgba(242, 215, 112, 0.12);
+}
+
+.admin-pill--green {
+  color: #6ee7a8;
+  border-color: rgba(52, 211, 153, 0.35);
+  background: rgba(6, 78, 59, 0.35);
+}
+
+.admin-pill--amber {
+  color: #fcd34d;
+  border-color: rgba(251, 191, 36, 0.35);
+  background: rgba(120, 53, 15, 0.35);
+}
+
+.admin-pill--rose {
+  color: #fda4af;
+  border-color: rgba(251, 113, 133, 0.35);
+  background: rgba(120, 20, 40, 0.35);
+}
+
+/* Thin gold rule used under page headings */
+.admin-rule {
+  height: 1px;
+  border: 0;
+  background: linear-gradient(90deg, transparent, rgba(242, 215, 112, 0.35) 18%, rgba(242, 215, 112, 0.35) 82%, transparent);
 }
 
 @keyframes fadeIn {
@@ -42,4 +278,12 @@ body {
 
 .animate-fade-in {
   animation: fadeIn 0.15s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-card,
+  .admin-btn-gold,
+  .admin-btn-ghost {
+    transition: none;
+  }
 }

@@ -54,10 +54,10 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-2xl bg-studio-card border border-studio-gold/30 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in">
+      <div className="admin-panel relative w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-studio-border bg-studio-purple/40">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[color:var(--hairline)] bg-black/25">
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-lg bg-studio-gold/20 text-studio-gold">
               <GitCommit className="w-5 h-5" />
@@ -66,7 +66,7 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
               <h3 className="font-cinzel font-bold text-lg text-studio-gold">
                 Review & Commit Changes
               </h3>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-[color:var(--ink-muted)]">
                 {dirtyCount} pending modification{dirtyCount === 1 ? '' : 's'} ready for GitHub deployment
               </p>
             </div>
@@ -74,7 +74,7 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
           <button
             onClick={onClose}
             disabled={saving}
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-1.5 rounded-lg text-[color:var(--ink-faint)] hover:text-studio-gold hover:bg-white/10 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -95,27 +95,27 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
                 {stagedImages.map((img) => (
                   <div
                     key={img.id}
-                    className="flex items-center gap-3 p-2.5 rounded-xl bg-studio-dark/70 border border-studio-border group"
+                    className="flex items-center gap-3 p-2.5 rounded-xl bg-black/25 border border-[color:var(--hairline)] group"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={img.previewUrl}
                       alt={img.title}
-                      className="w-14 h-14 object-cover rounded-lg border border-studio-gold/30 flex-none"
+                      className="w-14 h-14 object-cover rounded-lg border border-[color:var(--hairline-strong)] flex-none"
                     />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-zinc-200 truncate">{img.title}</p>
                       <p className="text-xs text-studio-gold truncate">
                         Gallery: <span className="text-amber-200 font-semibold">{img.targetGallery}</span>
                       </p>
-                      <p className="text-[11px] text-zinc-400">
+                      <p className="text-[11px] text-[color:var(--ink-muted)]">
                         {img.price} • {Math.round(img.sizeBytes / 1024)} KB
                       </p>
                     </div>
                     <button
                       onClick={() => removeStagedImage(img.id)}
                       title="Remove from staging"
-                      className="text-zinc-500 hover:text-rose-400 p-1 transition-colors"
+                      className="text-[color:var(--ink-faint)] hover:text-rose-400 p-1 transition-colors"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -131,34 +131,33 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
               <Settings className="w-4 h-4" />
               Content Modifications
             </div>
-            <div className="p-3.5 rounded-xl bg-studio-dark/50 border border-studio-border/60 text-xs text-zinc-300 space-y-2">
+            <div className="p-3.5 rounded-xl bg-black/25 border border-[color:var(--hairline)] text-xs text-[color:var(--ink)] space-y-2">
               <div className="flex items-center justify-between">
-                <span>Target Repository:</span>
+                <span className="text-[color:var(--ink-muted)]">Target Repository:</span>
                 <span className="font-mono text-studio-gold">abhay2008/AnugrujaArtsStudio (main)</span>
               </div>
               <div className="flex items-center justify-between">
-                <span>Persistence Mode:</span>
+                <span className="text-[color:var(--ink-muted)]">Persistence Mode:</span>
                 <span className="text-emerald-400">Direct Git Contents API + Local Sibling Mirror</span>
               </div>
               <div className="flex items-center justify-between">
-                <span>Access Token:</span>
-                <span className="text-zinc-400 font-mono">
-                  {tokenOverride ? 'Fine-Grained PAT Active' : 'Default Repo Token'}
-                </span>
+                <span className="text-[color:var(--ink-muted)]">Access Token:</span>                  <span className="text-[color:var(--ink-faint)] font-mono">
+                    {tokenOverride ? 'Fine-Grained PAT Active' : 'Default Repo Token'}
+                  </span>
               </div>
             </div>
           </div>
 
           {/* Commit Message Authoring */}
           <div className="space-y-2">
-            <label className="block text-xs font-medium text-zinc-300">
+            <label className="block text-xs font-medium text-[color:var(--ink)]">
               GitHub Commit Message
             </label>
             <textarea
               value={commitMessage}
               onChange={(e) => setCommitMessage(e.target.value)}
               rows={2}
-              className="w-full px-3 py-2 text-sm bg-studio-dark border border-studio-border rounded-xl focus:border-studio-gold focus:outline-none text-zinc-100 resize-none font-mono"
+              className="admin-input resize-none font-mono text-sm"
               placeholder="Descriptive summary of artworks and content changes..."
             />
           </div>
@@ -181,12 +180,12 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-studio-border bg-studio-purple/30">
+        <div className="flex items-center justify-between px-6 py-4 border-t border-[color:var(--hairline)] bg-black/20">
           <button
             type="button"
             onClick={onClose}
             disabled={saving}
-            className="px-4 py-2 text-sm text-zinc-400 hover:text-white transition-colors"
+            className="px-4 py-2 text-sm text-[color:var(--ink-muted)] hover:text-studio-gold transition-colors"
           >
             Cancel
           </button>

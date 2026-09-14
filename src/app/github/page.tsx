@@ -66,7 +66,7 @@ export default function GitHubSyncPage() {
         <h1 className="font-cinzel text-2xl font-bold text-studio-gold">
           GitHub Integration & Fine-Grained Access Tokens
         </h1>
-        <p className="text-zinc-400 mt-0.5">
+        <p className="text-[color:var(--ink-muted)] mt-0.5">
           Configure secure Git-backed headless persistence for public and private repositories
         </p>
       </div>
@@ -75,8 +75,8 @@ export default function GitHubSyncPage() {
       <div
         className={`p-6 rounded-2xl border shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all ${
           isConnected
-            ? 'bg-emerald-950/20 border-emerald-500/40 text-emerald-300'
-            : 'bg-amber-950/20 border-amber-500/40 text-amber-300'
+            ? 'bg-emerald-950/15 border-emerald-500/30 text-emerald-300'
+            : 'bg-amber-950/15 border-amber-500/30 text-amber-300'
         }`}
       >
         <div className="flex items-center gap-3">
@@ -106,7 +106,7 @@ export default function GitHubSyncPage() {
         <button
           onClick={() => fetchDiagnostics()}
           disabled={testing}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-studio-dark border border-studio-border hover:border-studio-gold/50 text-studio-gold transition-colors self-start md:self-auto"
+          className="admin-btn-ghost px-4 py-2 text-studio-gold hover:text-studio-gold self-start md:self-auto"
         >
           {testing ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -119,8 +119,8 @@ export default function GitHubSyncPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Token Management Card */}
-        <div className="p-6 rounded-2xl bg-studio-card border border-studio-border space-y-4">
-          <div className="flex items-center gap-2 border-b border-studio-border pb-3">
+        <div className="admin-panel p-6 space-y-4">
+          <div className="flex items-center gap-2 border-b border-[color:var(--hairline)] pb-3">
             <Key className="w-4 h-4 text-studio-gold" />
             <h3 className="font-cinzel font-bold text-sm text-studio-gold uppercase tracking-wider">
               Token Configuration
@@ -129,7 +129,7 @@ export default function GitHubSyncPage() {
 
           <div className="space-y-3">
             <div className="space-y-1">
-              <label className="text-zinc-300 font-medium">
+              <label className="admin-label">
                 Fine-Grained Personal Access Token (PAT)
               </label>
               <input
@@ -137,15 +137,15 @@ export default function GitHubSyncPage() {
                 value={tokenInput}
                 onChange={(e) => setTokenInput(e.target.value)}
                 placeholder="github_pat_11A... or ghp_..."
-                className="w-full px-3.5 py-2.5 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 font-mono text-xs focus:border-studio-gold focus:outline-none"
+                className="admin-input font-mono text-xs"
               />
-              <p className="text-[11px] text-zinc-400">
+              <p className="text-[11px] text-[color:var(--ink-muted)]">
                 You can generate a fine-grained token scoped strictly to this repository.
               </p>
             </div>
 
             {saveSuccess && (
-              <div className="p-2.5 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-[11px] flex items-center gap-1.5">
+              <div className="p-2.5 rounded-lg bg-emerald-950/30 border border-emerald-500/30 text-emerald-300 text-[11px] flex items-center gap-1.5">
                 <CheckCircle className="w-3.5 h-3.5" />
                 <span>Token saved and applied to active session!</span>
               </div>
@@ -154,14 +154,14 @@ export default function GitHubSyncPage() {
             <div className="flex items-center gap-2 pt-2">
               <button
                 onClick={handleSaveToken}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-semibold bg-studio-gold text-studio-purple-dark hover:bg-amber-300 transition-colors shadow-md"
+                className="admin-btn-gold px-4 py-2"
               >
                 <span>Save Token</span>
               </button>
               {tokenOverride && (
                 <button
                   onClick={handleClearToken}
-                  className="px-3 py-2 rounded-xl text-zinc-400 hover:text-rose-400 transition-colors"
+                  className="px-3 py-2 rounded-xl text-[color:var(--ink-muted)] hover:text-rose-400 transition-colors"
                 >
                   Clear Token
                 </button>
@@ -170,23 +170,23 @@ export default function GitHubSyncPage() {
           </div>
 
           {/* Repo Config Breakdown */}
-          <div className="pt-3 border-t border-studio-border/60 space-y-2 text-zinc-300">
+          <div className="pt-3 border-t border-[color:var(--hairline)] space-y-2 text-[color:var(--ink)]">
             <h4 className="font-semibold text-studio-gold">Repository Target Settings</h4>
-            <div className="p-3 rounded-xl bg-studio-dark/50 border border-studio-border/60 font-mono space-y-1.5 text-[11px]">
+            <div className="p-3 rounded-xl bg-black/25 border border-[color:var(--hairline)] font-mono space-y-1.5 text-[11px]">
               <div className="flex justify-between">
-                <span className="text-zinc-400">Public Customer Site:</span>
+                <span className="text-[color:var(--ink-muted)]">Public Customer Site:</span>
                 <span className="text-zinc-200">abhay2008/AnugrujaArtsStudio</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-400">Admin Console Repo:</span>
+                <span className="text-[color:var(--ink-muted)]">Admin Console Repo:</span>
                 <span className="text-zinc-200">abhay2008/AnugrujaArtsStudio-Admin</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-400">Production Branch:</span>
+                <span className="text-[color:var(--ink-muted)]">Production Branch:</span>
                 <span className="text-studio-gold">main</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-400">Local Sibling Sync:</span>
+                <span className="text-[color:var(--ink-muted)]">Local Sibling Sync:</span>
                 <span className="text-emerald-400">Active (../AnugrujaArtsStudio)</span>
               </div>
             </div>
@@ -194,8 +194,8 @@ export default function GitHubSyncPage() {
         </div>
 
         {/* Diagnostic Results & Latest Commit */}
-        <div className="p-6 rounded-2xl bg-studio-card border border-studio-border space-y-4">
-          <div className="flex items-center gap-2 border-b border-studio-border pb-3">
+        <div className="admin-panel p-6 space-y-4">
+          <div className="flex items-center gap-2 border-b border-[color:var(--hairline)] pb-3">
             <Server className="w-4 h-4 text-studio-gold" />
             <h3 className="font-cinzel font-bold text-sm text-studio-gold uppercase tracking-wider">
               Diagnostics & Deployment Info
@@ -203,15 +203,15 @@ export default function GitHubSyncPage() {
           </div>
 
           {diagnostics?.latestCommit ? (
-            <div className="p-4 rounded-xl bg-studio-dark/70 border border-studio-border space-y-2">
+            <div className="p-4 rounded-xl bg-black/25 border border-[color:var(--hairline)] space-y-2">
               <div className="flex items-center gap-2 text-studio-gold font-semibold">
                 <GitCommit className="w-4 h-4" />
                 <span>Latest Production Commit</span>
               </div>
-              <p className="font-mono text-zinc-200 text-xs line-clamp-2">
+              <p className="font-mono text-[color:var(--ink)] text-xs line-clamp-2">
                 &quot;{diagnostics.latestCommit.message}&quot;
               </p>
-              <div className="flex items-center justify-between text-[11px] text-zinc-400 pt-1">
+              <div className="flex items-center justify-between text-[11px] text-[color:var(--ink-muted)] pt-1">
                 <span>By: {diagnostics.latestCommit.author}</span>
                 <span className="font-mono text-studio-gold">
                   {diagnostics.latestCommit.sha?.slice(0, 7)}
@@ -219,18 +219,18 @@ export default function GitHubSyncPage() {
               </div>
             </div>
           ) : (
-            <div className="p-4 rounded-xl bg-studio-dark/40 border border-studio-border text-zinc-400 text-center">
+            <div className="p-4 rounded-xl bg-black/25 border border-[color:var(--hairline)] text-[color:var(--ink-muted)] text-center">
               Commit telemetry will appear once token is verified.
             </div>
           )}
 
           {/* Step-by-step Fine-Grained Token Guide */}
-          <div className="p-4 rounded-xl bg-studio-dark/50 border border-studio-border/60 space-y-2">
+          <div className="p-4 rounded-xl bg-black/25 border border-[color:var(--hairline)] space-y-2">
             <h4 className="font-semibold text-studio-gold flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4" />
               Required Fine-Grained PAT Permissions:
             </h4>
-            <div className="space-y-1.5 text-zinc-400 text-[11px]">
+            <div className="space-y-1.5 text-[color:var(--ink-muted)] text-[11px]">
               <p>
                 1. Navigate to <strong>GitHub &gt; Settings &gt; Developer settings &gt; Personal access tokens &gt; Fine-grained tokens</strong>.
               </p>

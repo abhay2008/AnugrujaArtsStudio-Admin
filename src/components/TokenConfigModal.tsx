@@ -61,10 +61,10 @@ export default function TokenConfigModal({ isOpen, onClose }: TokenConfigModalPr
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-xl bg-studio-card border border-studio-gold/30 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in">
+      <div className="admin-panel relative w-full max-w-xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-studio-border bg-studio-purple/40">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[color:var(--hairline)] bg-black/25">
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-lg bg-studio-gold/20 text-studio-gold">
               <Key className="w-5 h-5" />
@@ -73,14 +73,14 @@ export default function TokenConfigModal({ isOpen, onClose }: TokenConfigModalPr
               <h3 className="font-cinzel font-bold text-lg text-studio-gold">
                 GitHub Fine-Grained Token
               </h3>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-[color:var(--ink-muted)]">
                 Configure fine-grained PAT for automated commits to GitHub
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-1.5 rounded-lg text-[color:var(--ink-faint)] hover:text-studio-gold hover:bg-white/10 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -91,7 +91,7 @@ export default function TokenConfigModal({ isOpen, onClose }: TokenConfigModalPr
           {/* Token Input Field */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-zinc-300">
+              <label className="admin-label">
                 Personal Access Token (PAT)
               </label>
               {tokenInput && (
@@ -108,9 +108,9 @@ export default function TokenConfigModal({ isOpen, onClose }: TokenConfigModalPr
               value={tokenInput}
               onChange={(e) => setTokenInput(e.target.value)}
               placeholder="github_pat_11A... or ghp_..."
-              className="w-full px-4 py-2.5 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 font-mono text-sm focus:border-studio-gold focus:outline-none placeholder:text-zinc-600"
+              className="admin-input font-mono text-sm"
             />
-            <p className="text-[11px] text-zinc-400">
+            <p className="text-[11px] text-[color:var(--ink-muted)]">
               Saved securely in your local browser session and used for GitHub REST API calls.
             </p>
           </div>
@@ -151,12 +151,12 @@ export default function TokenConfigModal({ isOpen, onClose }: TokenConfigModalPr
           )}
 
           {/* Step-by-step Fine-Grained PAT Instructions */}
-          <div className="p-4 rounded-xl bg-studio-dark/60 border border-studio-border/70 space-y-2.5 text-xs text-zinc-300">
+          <div className="p-4 rounded-xl bg-black/25 border border-[color:var(--hairline)] space-y-2.5 text-xs text-[color:var(--ink)]">
             <h4 className="font-semibold text-studio-gold flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4" />
               How to create your Fine-Grained Access Token:
             </h4>
-            <ol className="list-decimal list-inside space-y-1.5 text-zinc-400 text-[11px]">
+            <ol className="list-decimal list-inside space-y-1.5 text-[color:var(--ink-muted)] text-[11px]">
               <li>
                 Open{' '}
                 <a
@@ -181,12 +181,12 @@ export default function TokenConfigModal({ isOpen, onClose }: TokenConfigModalPr
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-studio-border bg-studio-purple/30">
+        <div className="flex items-center justify-between px-6 py-4 border-t border-[color:var(--hairline)] bg-black/20">
           <button
             type="button"
             onClick={handleTestToken}
             disabled={testing || !tokenInput}
-            className="flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg bg-studio-purple/60 border border-studio-border hover:border-studio-gold/50 text-studio-gold transition-colors disabled:opacity-50"
+            className="admin-btn-ghost px-4 py-2 text-studio-gold hover:text-studio-gold disabled:opacity-50"
           >
             {testing ? (
               <>
@@ -205,14 +205,14 @@ export default function TokenConfigModal({ isOpen, onClose }: TokenConfigModalPr
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs text-zinc-400 hover:text-white transition-colors"
+              className="px-4 py-2 text-xs text-[color:var(--ink-muted)] hover:text-studio-gold transition-colors"
             >
               Cancel
             </button>
             <button
               type="button"
               onClick={handleSave}
-              className="px-4 py-2 text-xs font-semibold rounded-lg bg-studio-gold text-studio-purple-dark hover:bg-amber-300 transition-colors shadow-md"
+              className="admin-btn-gold px-4 py-2"
             >
               Save Token
             </button>

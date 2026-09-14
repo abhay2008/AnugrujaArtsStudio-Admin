@@ -56,27 +56,33 @@ export default function AdminNav({ onOpenReviewModal, onOpenTokenModal }: AdminN
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-studio-dark/95 backdrop-blur-md border-b border-studio-border shadow-xl">
+    <header className="sticky top-0 z-40 border-b border-studio-gold/15 bg-[#140820]/80 backdrop-blur-xl shadow-[0_10px_36px_-18px_rgba(0,0,0,0.8)]">
+      {/* Gold foil top edge — the vitrine catch-light */}
+      <div
+        aria-hidden
+        className="h-[2px] w-full bg-[linear-gradient(90deg,transparent_0%,#b8933a_18%,#f2d770_50%,#b8933a_82%,transparent_100%)] opacity-80"
+      />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Brand Logo & Name */}
+          {/* Brand crest + wordmark */}
           <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-studio-gold-dark via-studio-gold to-amber-200 flex items-center justify-center text-studio-purple-dark font-cinzel font-black text-xl shadow-lg group-hover:scale-105 transition-transform">
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <div className="w-10 h-10 rounded-xl bg-[linear-gradient(150deg,#f7e494_0%,#d4af37_55%,#8a6410_100%)] flex items-center justify-center text-[#221204] font-cinzel font-black text-xl shadow-[0_6px_18px_-6px_rgba(212,175,55,0.7),inset_0_1px_0_rgba(255,255,255,0.6)] ring-1 ring-amber-200/40 group-hover:scale-105 transition-transform">
                 A
               </div>
               <div>
-                <span className="font-cinzel text-lg tracking-wider text-studio-gold font-bold block leading-tight">
+                <span className="font-cinzel text-lg tracking-[0.14em] text-studio-gold font-bold block leading-tight">
                   ANUGRUJA
                 </span>
-                <span className="text-[10px] tracking-widest text-amber-200/60 uppercase font-sans font-medium">
-                  Studio Admin Console
+                <span className="text-[9px] tracking-[0.3em] text-amber-200/50 uppercase font-sans font-semibold">
+                  Atelier Console
                 </span>
               </div>
             </Link>
           </div>
 
-          {/* Desktop Navigation Links */}
+          {/* Desktop navigation — quiet pills, gold when active */}
           <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -85,10 +91,10 @@ export default function AdminNav({ onOpenReviewModal, onOpenTokenModal }: AdminN
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-full text-[13px] font-medium transition-all ${
                     isActive
-                      ? 'bg-studio-gold/15 text-studio-gold border border-studio-gold/30 shadow-inner'
-                      : 'text-zinc-300 hover:text-studio-gold hover:bg-studio-purple/40'
+                      ? 'bg-studio-gold/12 text-studio-gold border border-studio-gold/35 shadow-[inset_0_1px_0_rgba(255,251,235,0.08)]'
+                      : 'text-zinc-300/90 border border-transparent hover:text-studio-gold hover:bg-white/[0.04] hover:border-studio-gold/20'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -98,64 +104,64 @@ export default function AdminNav({ onOpenReviewModal, onOpenTokenModal }: AdminN
             })}
           </nav>
 
-          {/* Right Action Bar */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Fine-Grained Token Quick Status */}
+          {/* Right action bar */}
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            {/* Fine-grained token quick status */}
             <button
               onClick={onOpenTokenModal}
               title="Configure GitHub Fine-Grained Access Token"
-              className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                tokenOverride
-                  ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300 hover:bg-emerald-900/40'
-                  : 'bg-amber-950/30 border-amber-500/30 text-amber-300 hover:bg-amber-900/30'
-              }`}
+              className={`admin-pill ${
+                tokenOverride ? 'admin-pill--green' : 'admin-pill--amber'
+              } hover:brightness-125 transition-all cursor-pointer`}
             >
-              <Key className="w-3.5 h-3.5" />
-              <span>{tokenOverride ? 'PAT Active' : 'PAT Setup'}</span>
+              <Key className="w-3 h-3" />
+              <span className="hidden sm:inline">{tokenOverride ? 'PAT Active' : 'PAT Setup'}</span>
             </button>
 
-            {/* Unsaved Changes / Commit Button */}
+            {/* Unsaved changes / commit CTA */}
             {hasUnsavedChanges ? (
               <button
                 onClick={onOpenReviewModal}
-                className="relative flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-studio-gold via-amber-300 to-studio-gold text-studio-purple-dark shadow-[0_0_15px_rgba(242,215,112,0.4)] hover:shadow-[0_0_25px_rgba(242,215,112,0.7)] active:scale-95 transition-all animate-pulse"
+                className="admin-btn-gold !rounded-full !px-4 !py-2 !text-xs animate-pulse"
               >
-                <Sparkles className="w-4 h-4" />
-                <span>Review & Commit ({dirtyCount})</span>
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>
+                  Review &amp; Commit ({dirtyCount})
+                </span>
               </button>
             ) : (
-              <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs text-zinc-400 bg-studio-card/60 border border-studio-border">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <div className="admin-pill admin-pill--green hidden lg:inline-flex">
+                <ShieldCheck className="w-3 h-3" />
                 <span>In Sync</span>
               </div>
             )}
 
-            {/* View Live Public Site */}
+            {/* View live public site */}
             <a
               href="http://localhost:3000"
               target="_blank"
               rel="noreferrer"
               title="View Public Site (opens port 3000)"
-              className="hidden lg:flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs text-zinc-300 hover:text-studio-gold bg-studio-purple/30 border border-studio-border hover:border-studio-gold/40 transition-colors"
+              className="admin-btn-ghost !rounded-full !px-3 !py-2 !text-xs hidden lg:inline-flex"
             >
               <span>Public Site</span>
               <ExternalLink className="w-3 h-3" />
             </a>
 
-            {/* Logout Button */}
+            {/* Logout */}
             <button
               onClick={handleLogout}
               disabled={loggingOut}
               title="Sign Out of Studio Admin"
-              className="p-2 text-zinc-400 hover:text-rose-400 hover:bg-rose-950/20 rounded-lg transition-colors"
+              className="p-2 text-zinc-400 hover:text-rose-300 hover:bg-rose-950/25 rounded-full transition-colors"
             >
               <LogOut className="w-4 h-4" />
             </button>
 
-            {/* Mobile Hamburger Menu */}
+            {/* Mobile hamburger */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-zinc-300 hover:text-studio-gold rounded-lg hover:bg-studio-purple/30"
+              className="md:hidden p-2 text-zinc-300 hover:text-studio-gold rounded-lg hover:bg-white/[0.05]"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -164,9 +170,9 @@ export default function AdminNav({ onOpenReviewModal, onOpenTokenModal }: AdminN
         </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-studio-card/95 border-b border-studio-border px-4 pt-2 pb-4 space-y-1">
+        <div className="md:hidden bg-[#1a0b24]/95 backdrop-blur-xl border-b border-studio-gold/15 px-4 pt-2 pb-4 space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -175,10 +181,10 @@ export default function AdminNav({ onOpenReviewModal, onOpenTokenModal }: AdminN
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-base font-medium ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-base font-medium ${
                   isActive
-                    ? 'bg-studio-gold/15 text-studio-gold border border-studio-gold/30'
-                    : 'text-zinc-300 hover:text-studio-gold hover:bg-studio-purple/40'
+                    ? 'bg-studio-gold/12 text-studio-gold border border-studio-gold/35'
+                    : 'text-zinc-300 hover:text-studio-gold hover:bg-white/[0.04]'
                 }`}
               >
                 <Icon className="w-5 h-5" />
@@ -187,13 +193,13 @@ export default function AdminNav({ onOpenReviewModal, onOpenTokenModal }: AdminN
             );
           })}
 
-          <div className="pt-2 border-t border-studio-border mt-2 flex flex-col gap-2">
+          <div className="pt-2 border-t border-studio-gold/15 mt-2 flex flex-col gap-1">
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
                 onOpenTokenModal();
               }}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-300 hover:text-studio-gold"
+              className="flex items-center gap-2 px-3 py-2.5 text-sm text-zinc-300 hover:text-studio-gold"
             >
               <Key className="w-4 h-4 text-studio-gold" />
               <span>Configure GitHub Fine-Grained Token</span>
@@ -202,7 +208,7 @@ export default function AdminNav({ onOpenReviewModal, onOpenTokenModal }: AdminN
               href="http://localhost:3000"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-300 hover:text-studio-gold"
+              className="flex items-center gap-2 px-3 py-2.5 text-sm text-zinc-300 hover:text-studio-gold"
             >
               <ExternalLink className="w-4 h-4 text-studio-gold" />
               <span>View Public Studio Site</span>

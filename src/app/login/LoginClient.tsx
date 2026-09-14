@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Lock, Key, ShieldCheck, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
+import { Lock, Key, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
 
 export default function LoginClient() {
   const router = useRouter();
@@ -41,22 +41,33 @@ export default function LoginClient() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-studio-card border border-studio-gold/30 rounded-3xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.6)] backdrop-blur-xl relative overflow-hidden">
-        {/* Decorative Top Glow */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-studio-gold to-transparent" />
+    <div className="min-h-[80vh] flex items-center justify-center px-4 relative">
+      {/* Ambient halo behind the card */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 flex items-center justify-center"
+      >
+        <div className="w-[560px] h-[560px] rounded-full bg-[radial-gradient(circle,rgba(242,215,112,0.08)_0%,rgba(125,60,152,0.07)_40%,transparent_70%)] blur-2xl" />
+      </div>
 
-        {/* Brand Crest */}
+      <div className="admin-panel relative w-full max-w-md p-8 sm:p-9 overflow-hidden animate-fade-in ring-1 ring-studio-gold/20">
+        {/* Foil top edge */}
+        <div
+          aria-hidden
+          className="absolute top-0 left-0 right-0 h-[2px] bg-[linear-gradient(90deg,transparent_0%,#b8933a_20%,#f2d770_50%,#b8933a_80%,transparent_100%)]"
+        />
+
+        {/* Brand crest */}
         <div className="text-center space-y-3 mb-8">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-studio-gold-dark via-studio-gold to-amber-200 flex items-center justify-center text-studio-purple-dark font-cinzel font-black text-3xl shadow-xl">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-[linear-gradient(150deg,#f7e494_0%,#d4af37_55%,#8a6410_100%)] flex items-center justify-center text-[#221204] font-cinzel font-black text-3xl shadow-[0_12px_30px_-10px_rgba(212,175,55,0.7),inset_0_1px_0_rgba(255,255,255,0.6)] ring-1 ring-amber-200/40">
             A
           </div>
           <div>
-            <h1 className="font-cinzel text-2xl font-bold tracking-wider text-studio-gold">
-              ANUGRAHA ARTS
+            <h1 className="font-cinzel text-2xl font-bold tracking-[0.16em] text-studio-gold">
+              ANUGRUJA
             </h1>
-            <p className="text-xs text-amber-200/70 tracking-widest uppercase font-sans mt-1">
-              Studio Admin Portal
+            <p className="text-[10px] text-amber-200/60 tracking-[0.34em] uppercase font-sans mt-1.5">
+              Atelier Console
             </p>
           </div>
         </div>
@@ -64,26 +75,28 @@ export default function LoginClient() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-zinc-300">
+            <label className="admin-label" htmlFor="admin-password">
               Master Admin Password
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
                 <Lock className="w-4 h-4" />
               </div>
               <input
+                id="admin-password"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter access password"
                 autoFocus
                 required
-                className="w-full pl-10 pr-10 py-3 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 text-sm focus:border-studio-gold focus:outline-none placeholder:text-zinc-600 transition-colors"
+                className="admin-input !pl-10 !pr-10 !py-3"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-200"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-studio-gold transition-colors"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -96,15 +109,11 @@ export default function LoginClient() {
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={loading || !password}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-studio-gold via-amber-300 to-studio-gold text-studio-purple-dark shadow-lg hover:shadow-[0_0_25px_rgba(242,215,112,0.5)] active:scale-98 disabled:opacity-50 transition-all"
-          >
+          <button type="submit" disabled={loading || !password} className="admin-btn-gold w-full !py-3 !text-sm">
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Authenticating...</span>
+                <span>Authenticating…</span>
               </>
             ) : (
               <>
@@ -115,11 +124,14 @@ export default function LoginClient() {
           </button>
         </form>
 
-        {/* Hint / Local Development Helper */}
-        <div className="mt-8 pt-4 border-t border-studio-border/50 text-center">
+        {/* Hint / local development helper */}
+        <div className="mt-8 pt-4 border-t border-studio-gold/15 text-center">
           <p className="text-[11px] text-zinc-400 flex items-center justify-center gap-1.5">
             <Key className="w-3.5 h-3.5 text-studio-gold" />
-            <span>Default admin password: <code className="font-mono text-studio-gold">REDACTED-SECRET-REMOVED-FROM-HISTORY</code></span>
+            <span>
+              Default admin password:{' '}
+              <code className="font-mono text-studio-gold">REDACTED-SECRET-REMOVED-FROM-HISTORY</code>
+            </span>
           </p>
         </div>
       </div>

@@ -67,14 +67,13 @@ export default function ContentSettingsPage() {
           <h1 className="font-cinzel text-2xl font-bold text-studio-gold">
             Studio Content & Profile Editor
           </h1>
-          <p className="text-xs text-zinc-400">
-            Configure studio biography, contact channels, WhatsApp quick link, and SEO
-          </p>
+        <p className="text-xs text-[color:var(--ink-muted)]">
+          Configure studio biography, contact channels, WhatsApp quick link, and SEO
+        </p>
         </div>
       </div>
 
-      {toastMessage && (
-        <div className="p-3 bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 rounded-xl text-xs flex items-center gap-2 animate-fade-in">
+      {toastMessage && (          <div className="p-3 bg-emerald-950/30 border border-emerald-500/30 text-emerald-300 rounded-xl text-xs flex items-center gap-2 animate-fade-in">
           <CheckCircle className="w-4 h-4 text-emerald-400 flex-none" />
           <span>{toastMessage}</span>
         </div>
@@ -82,8 +81,8 @@ export default function ContentSettingsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-xs">
         {/* Section 1: Studio Brand & Founder */}
-        <div className="p-6 rounded-2xl bg-studio-card border border-studio-border space-y-4">
-          <div className="flex items-center gap-2 border-b border-studio-border pb-3">
+        <div className="admin-panel p-6 space-y-4">
+          <div className="flex items-center gap-2 border-b border-[color:var(--hairline)] pb-3">
             <FileText className="w-4 h-4 text-studio-gold" />
             <h2 className="font-cinzel font-bold text-sm text-studio-gold uppercase tracking-wider">
               Studio Identity & Founder
@@ -92,7 +91,7 @@ export default function ContentSettingsPage() {
 
           <div className="space-y-3">
             <div className="space-y-1">
-              <label className="text-zinc-300 font-medium">Studio Name</label>
+              <label className="admin-label">Studio Name</label>
               <input
                 type="text"
                 value={brand?.name || ''}
@@ -100,12 +99,12 @@ export default function ContentSettingsPage() {
                   updateBrand({ name: e.target.value });
                   showToast('Studio name updated');
                 }}
-                className="w-full px-3 py-2 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 focus:border-studio-gold focus:outline-none"
+                className="admin-input"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-zinc-300 font-medium">Studio Tagline</label>
+              <label className="admin-label">Studio Tagline</label>
               <input
                 type="text"
                 value={brand?.tagline || ''}
@@ -113,12 +112,12 @@ export default function ContentSettingsPage() {
                   updateBrand({ tagline: e.target.value });
                   showToast('Tagline updated');
                 }}
-                className="w-full px-3 py-2 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 focus:border-studio-gold focus:outline-none"
+                className="admin-input"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-zinc-300 font-medium">Founder & Master Artist Name</label>
+              <label className="admin-label">Founder & Master Artist Name</label>
               <input
                 type="text"
                 value={brand?.founder || ''}
@@ -126,12 +125,12 @@ export default function ContentSettingsPage() {
                   updateBrand({ founder: e.target.value });
                   showToast('Founder name updated');
                 }}
-                className="w-full px-3 py-2 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 focus:border-studio-gold focus:outline-none"
+                className="admin-input"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-zinc-300 font-medium">Artist Headline</label>
+              <label className="admin-label">Artist Headline</label>
               <input
                 type="text"
                 value={sections?.aboutArtist?.headline || ''}
@@ -139,12 +138,12 @@ export default function ContentSettingsPage() {
                   updateSection('aboutArtist', { headline: e.target.value });
                   showToast('Headline updated');
                 }}
-                className="w-full px-3 py-2 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 focus:border-studio-gold focus:outline-none"
+                className="admin-input"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-zinc-300 font-medium">Artist Subheading / Philosophy</label>
+              <label className="admin-label">Artist Subheading / Philosophy</label>
               <textarea
                 rows={3}
                 value={sections?.aboutArtist?.subheading || ''}
@@ -152,15 +151,15 @@ export default function ContentSettingsPage() {
                   updateSection('aboutArtist', { subheading: e.target.value });
                   showToast('Subheading updated');
                 }}
-                className="w-full px-3 py-2 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 focus:border-studio-gold focus:outline-none resize-none leading-relaxed"
+                className="admin-input resize-none leading-relaxed"
               />
             </div>
           </div>
         </div>
 
         {/* Section 2: Contact Channels & WhatsApp */}
-        <div className="p-6 rounded-2xl bg-studio-card border border-studio-border space-y-4">
-          <div className="flex items-center gap-2 border-b border-studio-border pb-3">
+        <div className="admin-panel p-6 space-y-4">
+          <div className="flex items-center gap-2 border-b border-[color:var(--hairline)] pb-3">
             <Phone className="w-4 h-4 text-studio-gold" />
             <h2 className="font-cinzel font-bold text-sm text-studio-gold uppercase tracking-wider">
               Contact & Inquiry Channels
@@ -169,7 +168,7 @@ export default function ContentSettingsPage() {
 
           <div className="space-y-3">
             <div className="space-y-1">
-              <label className="text-zinc-300 font-medium">Primary Contact Phone</label>
+              <label className="admin-label">Primary Contact Phone</label>
               <input
                 type="text"
                 value={brand?.phoneDisplay || ''}
@@ -177,13 +176,13 @@ export default function ContentSettingsPage() {
                   updateBrand({ phoneDisplay: e.target.value });
                   showToast('Phone updated');
                 }}
-                className="w-full px-3 py-2 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 focus:border-studio-gold focus:outline-none"
+                className="admin-input"
               />
             </div>
 
             <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <label className="text-zinc-300 font-medium">WhatsApp Link / Number</label>
+                <label className="admin-label">WhatsApp Link / Number</label>
                 <a
                   href={testWaUrl}
                   target="_blank"
@@ -202,12 +201,12 @@ export default function ContentSettingsPage() {
                   showToast('WhatsApp updated');
                 }}
                 placeholder="https://wa.link/... or +91 96112 55949"
-                className="w-full px-3 py-2 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 focus:border-studio-gold focus:outline-none"
+                className="admin-input"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-zinc-300 font-medium">Official Email Address</label>
+              <label className="admin-label">Official Email Address</label>
               <input
                 type="email"
                 value={brand?.email || ''}
@@ -215,12 +214,12 @@ export default function ContentSettingsPage() {
                   updateBrand({ email: e.target.value });
                   showToast('Email updated');
                 }}
-                className="w-full px-3 py-2 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 focus:border-studio-gold focus:outline-none"
+                className="admin-input"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-zinc-300 font-medium">Location Label</label>
+              <label className="admin-label">Location Label</label>
               <input
                 type="text"
                 value={brand?.locationLabel || ''}
@@ -229,14 +228,13 @@ export default function ContentSettingsPage() {
                   showToast('Location updated');
                 }}
                 placeholder="e.g. Bengaluru & Chennai"
-                className="w-full px-3 py-2 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 focus:border-studio-gold focus:outline-none"
+                className="admin-input"
               />
             </div>
           </div>
 
           {/* SEO Metadata */}
-          <div className="pt-2 border-t border-studio-border/50 space-y-2">
-            <h3 className="font-semibold text-zinc-300 text-xs">Search Engine Optimization (SEO)</h3>
+            <div className="pt-2 border-t border-[color:var(--hairline)] space-y-2">              <h3 className="font-semibold text-studio-gold text-xs">Search Engine Optimization (SEO)</h3>
             <div className="space-y-2">
               <input
                 type="text"
@@ -250,7 +248,7 @@ export default function ContentSettingsPage() {
                 value={meta?.description || ''}
                 onChange={(e) => updateMeta({ description: e.target.value })}
                 placeholder="Google Meta Description"
-                className="w-full px-3 py-1.5 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 focus:border-studio-gold focus:outline-none resize-none"
+                className="admin-input resize-none"
               />
             </div>
           </div>

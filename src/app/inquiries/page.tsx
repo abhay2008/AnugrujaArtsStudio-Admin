@@ -113,7 +113,7 @@ export default function InquiriesPage() {
           <h1 className="font-cinzel text-2xl font-bold text-studio-gold">
             Inquiries & Client Lead Tracker
           </h1>
-          <p className="text-xs text-zinc-400">
+          <p className="text-xs text-[color:var(--ink-muted)]">
             Manage commission requests, class enrollments, and respond with one-click WhatsApp messages
           </p>
         </div>
@@ -121,7 +121,7 @@ export default function InquiriesPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowCalculator(!showCalculator)}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-studio-card border border-studio-gold/40 text-studio-gold hover:bg-studio-purple/40 transition-colors"
+            className="admin-btn-ghost px-3.5 py-2 text-studio-gold hover:text-studio-gold"
           >
             <Calculator className="w-4 h-4" />
             <span>Pricing Calculator</span>
@@ -129,7 +129,7 @@ export default function InquiriesPage() {
 
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-studio-gold text-studio-purple-dark hover:bg-amber-300 transition-colors shadow-md"
+            className="admin-btn-gold px-4 py-2"
           >
             <Plus className="w-4 h-4" />
             <span>Add Lead</span>
@@ -139,15 +139,15 @@ export default function InquiriesPage() {
 
       {/* Pricing Estimator Box */}
       {showCalculator && (
-        <div className="p-6 rounded-2xl bg-studio-card border border-studio-gold/40 shadow-xl space-y-4 animate-fade-in text-xs">
-          <div className="flex items-center justify-between border-b border-studio-border pb-3">
+        <div className="admin-panel p-6 space-y-4 animate-fade-in text-xs">
+          <div className="flex items-center justify-between border-b border-[color:var(--hairline)] pb-3">
             <div className="flex items-center gap-2 text-studio-gold font-cinzel font-bold text-sm">
               <Calculator className="w-4 h-4" />
               <span>Custom Artwork Commission Pricing Matrix</span>
             </div>
             <button
               onClick={() => setShowCalculator(false)}
-              className="text-zinc-400 hover:text-white"
+              className="text-[color:var(--ink-faint)] hover:text-studio-gold transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -155,29 +155,29 @@ export default function InquiriesPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div className="space-y-1">
-              <label className="text-zinc-300">Width (inches)</label>
+              <label className="admin-label">Width (inches)</label>
               <input
                 type="number"
                 value={calcWidth}
                 onChange={(e) => setCalcWidth(parseInt(e.target.value, 10) || 1)}
-                className="w-full px-3 py-1.5 bg-studio-dark border border-studio-border rounded-xl text-zinc-100"
+                className="admin-input"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-zinc-300">Height (inches)</label>
+              <label className="admin-label">Height (inches)</label>
               <input
                 type="number"
                 value={calcHeight}
                 onChange={(e) => setCalcHeight(parseInt(e.target.value, 10) || 1)}
-                className="w-full px-3 py-1.5 bg-studio-dark border border-studio-border rounded-xl text-zinc-100"
+                className="admin-input"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-zinc-300">Medium</label>
+              <label className="admin-label">Medium</label>
               <select
                 value={calcMedium}
                 onChange={(e) => setCalcMedium(e.target.value as any)}
-                className="w-full px-3 py-1.5 bg-studio-dark border border-studio-border rounded-xl text-zinc-100"
+                className="admin-input"
               >
                 <option value="watercolor">Watercolor on Arches (₹35/sq.in)</option>
                 <option value="acrylic">Acrylic on Canvas (₹45/sq.in)</option>
@@ -186,11 +186,11 @@ export default function InquiriesPage() {
               </select>
             </div>
             <div className="space-y-1">
-              <label className="text-zinc-300">Framing Option</label>
+              <label className="admin-label">Framing Option</label>
               <select
                 value={calcFrame}
                 onChange={(e) => setCalcFrame(e.target.value as any)}
-                className="w-full px-3 py-1.5 bg-studio-dark border border-studio-border rounded-xl text-zinc-100"
+                className="admin-input"
               >
                 <option value="none">Unframed Canvas</option>
                 <option value="teakwood">Natural Teakwood Frame (+₹4,500)</option>
@@ -201,14 +201,14 @@ export default function InquiriesPage() {
 
           <div className="flex items-center justify-between pt-2 border-t border-studio-border/60">
             <div>
-              <span className="text-zinc-400">Calculated Estimate: </span>
-              <span className="text-lg font-cinzel font-bold text-amber-300 ml-2">
+              <span className="text-[color:var(--ink-muted)]">Calculated Estimate: </span>
+              <span className="text-lg font-cinzel font-bold text-studio-gold ml-2">
                 ₹{estimatedPrice.toLocaleString('en-IN')}
               </span>
             </div>
             <button
               onClick={copyQuoteToClipboard}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-studio-purple text-studio-gold border border-studio-border hover:border-studio-gold/50 transition-colors"
+              className="admin-btn-ghost px-3 py-1.5 text-studio-gold hover:text-studio-gold"
             >
               {copiedQuote ? (
                 <>
@@ -227,7 +227,7 @@ export default function InquiriesPage() {
       )}
 
       {/* Filter Tabs & Search Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-2xl bg-studio-card border border-studio-border text-xs">
+      <div className="admin-panel flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 text-xs">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
           <input
@@ -235,7 +235,7 @@ export default function InquiriesPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search inquiries by name, phone, artwork..."
-            className="w-full pl-9 pr-3 py-1.5 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:border-studio-gold"
+            className="admin-input pl-9 pr-3 py-1.5 text-xs"
           />
         </div>
 
@@ -244,10 +244,8 @@ export default function InquiriesPage() {
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1.5 rounded-xl font-medium whitespace-nowrap transition-colors ${
-                statusFilter === st
-                  ? 'bg-studio-gold text-studio-purple-dark font-bold'
-                  : 'bg-studio-dark text-zinc-400 hover:text-white'
+              className={`px-3 py-1.5 font-medium whitespace-nowrap transition-colors ${
+                statusFilter === st ? 'admin-btn-gold' : 'admin-btn-ghost'
               }`}
             >
               {st === 'all' ? 'All Leads' : st}
@@ -259,7 +257,7 @@ export default function InquiriesPage() {
       {/* Inquiries List */}
       <div className="space-y-3">
         {filteredInquiries.length === 0 ? (
-          <div className="p-12 text-center rounded-2xl bg-studio-card border border-studio-border text-zinc-400">
+          <div className="admin-panel p-12 text-center text-[color:var(--ink-muted)]">
             No inquiries match your current filters.
           </div>
         ) : (
@@ -273,21 +271,21 @@ export default function InquiriesPage() {
             return (
               <div
                 key={inq.id}
-                className="p-5 rounded-2xl bg-studio-card border border-studio-border hover:border-studio-gold/40 shadow-lg transition-all space-y-3"
+                className="admin-card p-5 space-y-3"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-studio-purple text-studio-gold font-cinzel font-bold flex items-center justify-center border border-studio-border">
+                    <div className="w-9 h-9 rounded-full bg-studio-gold/10 text-studio-gold font-cinzel font-bold flex items-center justify-center border border-[color:var(--hairline-strong)]">
                       {inq.customerName.charAt(0)}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
                         <h3 className="font-semibold text-sm text-zinc-100">{inq.customerName}</h3>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-studio-dark text-studio-gold border border-studio-border">
+                        <span className="admin-pill admin-pill--gold">
                           {inq.interest}
                         </span>
                       </div>
-                      <p className="text-xs text-zinc-400 flex items-center gap-3 mt-0.5">
+                      <p className="text-xs text-[color:var(--ink-muted)] flex items-center gap-3 mt-0.5">
                         <span className="flex items-center gap-1">
                           <Phone className="w-3 h-3 text-zinc-500" />
                           {inq.phone}
@@ -308,7 +306,7 @@ export default function InquiriesPage() {
                     <select
                       value={inq.status}
                       onChange={(e) => saveInquiry({ ...inq, status: e.target.value as any })}
-                      className="px-2.5 py-1.5 rounded-lg text-xs bg-studio-dark border border-studio-border text-zinc-200 focus:outline-none focus:border-studio-gold"
+                      className="admin-input px-2.5 py-1.5 text-xs w-auto"
                     >
                       <option value="New">New</option>
                       <option value="In Discussion">In Discussion</option>
@@ -329,7 +327,7 @@ export default function InquiriesPage() {
 
                     <button
                       onClick={() => deleteInquiry(inq.id)}
-                      className="p-1.5 text-zinc-500 hover:text-rose-400 rounded-lg transition-colors"
+                      className="p-1.5 text-[color:var(--ink-faint)] hover:text-rose-400 rounded-lg transition-colors"
                       title="Remove lead"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -338,20 +336,20 @@ export default function InquiriesPage() {
                 </div>
 
                 {/* Details / Notes */}
-                <div className="p-3 rounded-xl bg-studio-dark/60 border border-studio-border/60 text-xs text-zinc-300 space-y-1">
+                <div className="p-3 rounded-xl bg-black/25 border border-[color:var(--hairline)] text-xs text-[color:var(--ink)] space-y-1">
                   <p>
                     <strong className="text-studio-gold">Artwork / Requirement:</strong>{' '}
                     {inq.artworkTitle || inq.interest}
                   </p>
                   {inq.notes && (
-                    <p className="text-zinc-400 leading-relaxed">
-                      <strong className="text-zinc-300">Notes:</strong> {inq.notes}
+                    <p className="text-[color:var(--ink-muted)] leading-relaxed">
+                      <strong className="text-[color:var(--ink)]">Notes:</strong> {inq.notes}
                     </p>
                   )}
-                  <div className="flex items-center gap-4 text-[11px] text-zinc-400 pt-1">
+                  <div className="flex items-center gap-4 text-[11px] text-[color:var(--ink-muted)] pt-1">
                     {inq.budget && (
                       <span>
-                        Client Budget: <strong className="text-zinc-200">{inq.budget}</strong>
+                        Client Budget: <strong className="text-[color:var(--ink)]">{inq.budget}</strong>
                       </span>
                     )}
                     {inq.quotedPrice && (
@@ -369,15 +367,15 @@ export default function InquiriesPage() {
 
       {/* Add Lead Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in text-xs">
-          <div className="relative w-full max-w-md bg-studio-card border border-studio-gold/30 rounded-2xl shadow-2xl p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-studio-border pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in text-xs">
+          <div className="admin-panel relative w-full max-w-md p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-[color:var(--hairline)] pb-3">
               <h3 className="font-cinzel font-bold text-base text-studio-gold">
                 Log New Customer Lead
               </h3>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="text-zinc-400 hover:text-white"
+                className="text-[color:var(--ink-faint)] hover:text-studio-gold transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -385,48 +383,48 @@ export default function InquiriesPage() {
 
             <form onSubmit={handleAddInquiry} className="space-y-3">
               <div className="space-y-1">
-                <label className="text-zinc-300">Customer Full Name *</label>
+                <label className="admin-label">Customer Full Name *</label>
                 <input
                   type="text"
                   required
                   value={custName}
                   onChange={(e) => setCustName(e.target.value)}
                   placeholder="e.g. Sangeeta Rao"
-                  className="w-full px-3 py-2 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 focus:border-studio-gold focus:outline-none"
+                  className="admin-input"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-zinc-300">Phone Number *</label>
+                  <label className="admin-label">Phone Number *</label>
                   <input
                     type="text"
                     required
                     value={custPhone}
                     onChange={(e) => setCustPhone(e.target.value)}
                     placeholder="+91 98450 12345"
-                    className="w-full px-3 py-2 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 focus:border-studio-gold focus:outline-none"
+                    className="admin-input"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-zinc-300">Email Address</label>
+                  <label className="admin-label">Email Address</label>
                   <input
                     type="email"
                     value={custEmail}
                     onChange={(e) => setCustEmail(e.target.value)}
                     placeholder="email@example.com"
-                    className="w-full px-3 py-2 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 focus:border-studio-gold focus:outline-none"
+                    className="admin-input"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-zinc-300">Interest Type</label>
+                  <label className="admin-label">Interest Type</label>
                   <select
                     value={custInterest}
                     onChange={(e) => setCustInterest(e.target.value as any)}
-                    className="w-full px-3 py-2 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 focus:border-studio-gold focus:outline-none"
+                    className="admin-input"
                   >
                     <option value="Commission">Custom Commission</option>
                     <option value="Art Purchase">Art Purchase</option>
@@ -436,30 +434,30 @@ export default function InquiriesPage() {
                   </select>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-zinc-300">Budget Estimate</label>
+                  <label className="admin-label">Budget Estimate</label>
                   <input
                     type="text"
                     value={custBudget}
                     onChange={(e) => setCustBudget(e.target.value)}
                     placeholder="e.g. ₹20,000"
-                    className="w-full px-3 py-2 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 focus:border-studio-gold focus:outline-none"
+                    className="admin-input"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="text-zinc-300">Requirement / Artwork Details</label>
+                <label className="admin-label">Requirement / Artwork Details</label>
                 <input
                   type="text"
                   value={custArtwork}
                   onChange={(e) => setCustArtwork(e.target.value)}
                   placeholder="e.g. 24x36 Oil Landscape or Weekend Watercolor"
-                  className="w-full px-3 py-2 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 focus:border-studio-gold focus:outline-none"
+                  className="admin-input"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-zinc-300">Notes</label>
+                <label className="admin-label">Notes</label>
                 <textarea
                   rows={2}
                   value={custNotes}
@@ -473,13 +471,13 @@ export default function InquiriesPage() {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 text-zinc-400 hover:text-white"
+                  className="px-4 py-2 text-[color:var(--ink-muted)] hover:text-studio-gold transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 font-semibold rounded-xl bg-studio-gold text-studio-purple-dark hover:bg-amber-300 transition-colors shadow-md"
+                  className="admin-btn-gold px-5 py-2"
                 >
                   Save Lead
                 </button>

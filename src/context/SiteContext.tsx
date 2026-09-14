@@ -10,6 +10,7 @@ import {
   SiteSections,
   Inquiry,
   StagedImage,
+  SocialLink,
 } from '@/lib/types';
 
 interface SiteContextType {
@@ -27,6 +28,7 @@ interface SiteContextType {
   clearStagedImages: () => void;
   updateBrand: (patch: Partial<SiteBrand>) => void;
   updateMeta: (patch: Partial<SiteMeta>) => void;
+  updateSocial: (social: SocialLink[]) => void;
   updateSection: <K extends keyof SiteSections>(sectionKey: K, patch: Partial<SiteSections[K]>) => void;
   addArtwork: (gallery: GalleryKey, artwork: Artwork) => void;
   updateArtwork: (gallery: GalleryKey, id: string, patch: Partial<Artwork>) => void;
@@ -144,6 +146,16 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
           ...prev.meta,
           ...patch,
         },
+      };
+    });
+  };
+
+  const updateSocial = (social: SocialLink[]) => {
+    setContent((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        social,
       };
     });
   };
@@ -291,13 +303,24 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
     if (JSON.stringify(content.meta) !== JSON.stringify(initialContent.meta)) {
       count += 1;
     }
+    // Social diff
+    if (JSON.stringify(content.social) !== JSON.stringify(initialContent.social)) {
+      count += 1;
+    }
     // Sections diff
     if (JSON.stringify(content.sections) !== JSON.stringify(initialContent.sections)) {
       count += 1;
     }
 
     // Galleries diff
-    for (const key of Object.keys(content.galleries) as GalleryKey[]) {
+    const allGalleryKeys = Array.from(
+      new Set([
+        ...Object.keys(content.galleries || {}),
+        ...Object.keys(initialContent.galleries || {}),
+      ])
+    ) as GalleryKey[];
+
+    for (const key of allGalleryKeys) {
       const curList = content.galleries[key] || [];
       const initList = initialContent.galleries[key] || [];
 
@@ -323,6 +346,9 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
     setSaving(true);
 
     try {
+      // Create a fresh clone of content so we can accumulate staged images directly into it
+      const workingContent: SiteContent = JSON.parse(JSON.stringify(content));
+
       for (const img of stagedImages) {
         const uploadRes = await fetch('/api/upload', {
           method: 'POST',
@@ -344,7 +370,7 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
         }
 
         const uploaded = await uploadRes.json();
-        addArtwork(img.targetGallery, {
+        const newArtwork: Artwork = {
           id: `art-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
           title: img.title || 'Untitled Artwork',
           category: img.category || 'Painting',
@@ -353,7 +379,10 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
           dimensions: img.dimensions || '18x24 in',
           status: 'available',
           src: uploaded.src,
-        });
+        };
+
+        const targetList = workingContent.galleries[img.targetGallery] || [];
+        workingContent.galleries[img.targetGallery] = [newArtwork, ...targetList];
       }
 
       const saveRes = await fetch('/api/content', {
@@ -363,7 +392,7 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
           ...(tokenOverride ? { 'x-github-token': tokenOverride } : {}),
         },
         body: JSON.stringify({
-          content,
+          content: workingContent,
           message,
           tokenOverride,
         }),
@@ -374,8 +403,9 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
         throw new Error(errData.error || 'Failed to commit site changes');
       }
 
+      setContent(workingContent);
+      setInitialContent(JSON.parse(JSON.stringify(workingContent)));
       clearStagedImages();
-      setInitialContent(JSON.parse(JSON.stringify(content)));
       return { success: true };
     } catch (err: any) {
       return { success: false, error: err.message || 'Commit transaction failed' };
@@ -421,6 +451,7 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
         clearStagedImages,
         updateBrand,
         updateMeta,
+        updateSocial,
         updateSection,
         addArtwork,
         updateArtwork,

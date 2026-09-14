@@ -135,20 +135,20 @@ export default function MassUploadPage() {
         <h1 className="font-cinzel text-2xl font-bold text-studio-gold">
           Mass Upload Studio
         </h1>
-        <p className="text-xs text-zinc-400">
+        <p className="text-xs text-[color:var(--ink-muted)]">
           Drop artwork photos for automatic canvas compression, tagging, and one-click GitHub push
         </p>
       </div>
 
       {successToast && (
-        <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-xs flex items-center gap-2 animate-fade-in">
+        <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2 animate-fade-in">
           <CheckCircle className="w-4 h-4 text-emerald-400 flex-none" />
           <span>{successToast}</span>
         </div>
       )}
 
       {/* Batch Defaults Controls */}
-      <div className="p-5 rounded-2xl bg-studio-card border border-studio-border space-y-4">
+      <div className="admin-panel p-5 space-y-4">
         <h2 className="text-xs font-bold font-cinzel text-studio-gold uppercase tracking-wider">
           Batch Target & Defaults
         </h2>
@@ -156,11 +156,11 @@ export default function MassUploadPage() {
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
           {/* Destination Collection */}
           <div className="space-y-1">
-            <label className="text-zinc-300 font-medium">Destination Gallery</label>
+            <label className="admin-label">Destination Gallery</label>
             <select
               value={targetGallery}
               onChange={(e) => setTargetGallery(e.target.value as GalleryKey)}
-              className="w-full px-3 py-2 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 focus:border-studio-gold focus:outline-none"
+              className="admin-input text-studio-gold font-semibold"
             >
               {GALLERIES_META.map((meta) => (
                 <option key={meta.key} value={meta.key}>
@@ -172,18 +172,18 @@ export default function MassUploadPage() {
 
           {/* Default Medium */}
           <div className="space-y-1">
-            <label className="text-zinc-300 font-medium">Default Medium</label>
+            <label className="admin-label">Default Medium</label>
             <input
               type="text"
               value={defaultMedium}
               onChange={(e) => setDefaultMedium(e.target.value)}
-              className="w-full px-3 py-2 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 focus:border-studio-gold focus:outline-none"
+              className="admin-input text-studio-gold font-semibold"
             />
           </div>
 
           {/* Default Price */}
           <div className="space-y-1">
-            <label className="text-zinc-300 font-medium">Default Price</label>
+            <label className="admin-label">Default Price</label>
             <input
               type="text"
               value={defaultPrice}
@@ -194,12 +194,12 @@ export default function MassUploadPage() {
 
           {/* Default Category */}
           <div className="space-y-1">
-            <label className="text-zinc-300 font-medium">Category</label>
+            <label className="admin-label">Category</label>
             <input
               type="text"
               value={defaultCategory}
               onChange={(e) => setDefaultCategory(e.target.value)}
-              className="w-full px-3 py-2 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 focus:border-studio-gold focus:outline-none"
+              className="admin-input text-studio-gold font-semibold"
             />
           </div>
         </div>
@@ -217,7 +217,7 @@ export default function MassUploadPage() {
         className={`relative border-2 border-dashed rounded-3xl p-8 sm:p-12 text-center cursor-pointer transition-all ${
           isDragOver
             ? 'border-studio-gold bg-studio-gold/10 scale-[1.01]'
-            : 'border-studio-border hover:border-studio-gold/60 bg-studio-card/60 hover:bg-studio-card'
+            : 'border-[color:var(--hairline-strong)] hover:border-studio-gold/60 bg-black/20 hover:bg-black/30'
         }`}
       >
         <input
@@ -230,7 +230,7 @@ export default function MassUploadPage() {
         />
 
         <div className="space-y-4 max-w-md mx-auto">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-studio-purple/80 border border-studio-gold/40 flex items-center justify-center text-studio-gold shadow-xl">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-studio-gold/10 border border-[color:var(--hairline-strong)] flex items-center justify-center text-studio-gold shadow-xl">
             {processing ? (
               <Loader2 className="w-8 h-8 animate-spin" />
             ) : (
@@ -241,7 +241,7 @@ export default function MassUploadPage() {
             <h3 className="font-cinzel text-lg font-bold text-white">
               {processing ? 'Optimizing Artwork Canvas...' : 'Select or Drop Paintings Here'}
             </h3>
-            <p className="text-xs text-zinc-400 mt-1">
+            <p className="text-xs text-[color:var(--ink-muted)] mt-1">
               Supports high-resolution JPEG, PNG, WEBP files. Browser compresses and resizes photos seamlessly for fast web loading.
             </p>
           </div>
@@ -257,7 +257,7 @@ export default function MassUploadPage() {
             </h2>
             <button
               onClick={handleStageAll}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl font-semibold text-xs bg-gradient-to-r from-studio-gold to-amber-300 text-studio-purple-dark hover:shadow-lg transition-all"
+              className="admin-btn-gold px-5 py-2"
             >
               <Sparkles className="w-4 h-4" />
               <span>Stage All for Commit</span>
@@ -273,14 +273,14 @@ export default function MassUploadPage() {
               return (
                 <div
                   key={item.id}
-                  className="p-4 rounded-2xl bg-studio-card border border-studio-border space-y-3 flex flex-col justify-between"
+                  className="admin-card p-4 space-y-3 flex flex-col justify-between"
                 >
                   <div className="flex gap-4">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={item.previewUrl}
                       alt={item.title}
-                      className="w-24 h-24 object-cover rounded-xl border border-studio-gold/30 flex-none"
+                      className="w-24 h-24 object-cover rounded-xl border border-[color:var(--hairline-strong)] flex-none"
                     />
                     <div className="flex-1 min-w-0 space-y-1.5 text-xs">
                       <input
@@ -288,7 +288,7 @@ export default function MassUploadPage() {
                         value={item.title}
                         onChange={(e) => updateItem(item.id, { title: e.target.value })}
                         placeholder="Artwork title"
-                        className="w-full px-2 py-1 bg-studio-dark border border-studio-border rounded-lg text-white font-medium focus:outline-none focus:border-studio-gold"
+                        className="admin-input text-white font-medium"
                       />
                       <div className="grid grid-cols-2 gap-2">
                         <input
@@ -296,14 +296,14 @@ export default function MassUploadPage() {
                           value={item.price}
                           onChange={(e) => updateItem(item.id, { price: e.target.value })}
                           placeholder="Price"
-                          className="w-full px-2 py-1 bg-studio-dark border border-studio-border rounded-lg text-amber-300 font-semibold focus:outline-none focus:border-studio-gold"
+                          className="admin-input text-studio-gold font-semibold"
                         />
                         <select
                           value={item.targetGallery}
                           onChange={(e) =>
                             updateItem(item.id, { targetGallery: e.target.value as GalleryKey })
                           }
-                          className="w-full px-2 py-1 bg-studio-dark border border-studio-border rounded-lg text-zinc-300 text-[11px] focus:outline-none focus:border-studio-gold"
+                          className="admin-input text-[11px]"
                         >
                           {GALLERIES_META.map((meta) => (
                             <option key={meta.key} value={meta.key}>
@@ -312,14 +312,14 @@ export default function MassUploadPage() {
                           ))}
                         </select>
                       </div>
-                      <p className="text-[11px] text-zinc-400">
+                      <p className="text-[11px] text-[color:var(--ink-muted)]">
                         Compressed: {Math.round(item.optimizedBytes / 1024)} KB{' '}
                         {savings > 0 && <span className="text-emerald-400">(-{savings}%)</span>}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-studio-border/50 text-xs">
+                  <div className="flex items-center justify-between pt-2 border-t border-[color:var(--hairline)] text-xs">
                     <span className="text-[11px] text-studio-gold truncate">{item.name}</span>
                     <button
                       onClick={() => removeItem(item.id)}
