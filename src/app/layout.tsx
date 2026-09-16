@@ -3,7 +3,7 @@ import './globals.css';
 import AdminLayoutShell from '@/components/AdminLayoutShell';
 
 export const metadata: Metadata = {
-  title: 'Anugraha Arts Studio — Master Admin & CMS Console',
+  title: 'Anugruja Arts Studio — Master Admin & CMS Console',
   description: 'Exclusive portfolio and content management console with GitHub Git-backed persistence.',
   robots: {
     index: false,

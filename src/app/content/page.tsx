@@ -58,7 +58,7 @@ export default function ContentSettingsPage() {
   const cleanWa = (brand?.whatsapp || '').replace(/[^0-9]/g, '');
   const testWaUrl = brand?.whatsapp?.startsWith('http')
     ? brand.whatsapp
-    : `https://wa.me/${cleanWa}?text=${encodeURIComponent('Namaste! Welcome to Anugraha Arts Studio.')}`;
+    : `https://wa.me/${cleanWa}?text=${encodeURIComponent('Namaste! Welcome to Anugruja Arts Studio.')}`;
 
   return (
     <div className="space-y-6">

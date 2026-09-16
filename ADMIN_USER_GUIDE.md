@@ -1,6 +1,6 @@
-# 🎨 Anugraha Arts Studio — Master Admin Console & CMS User Guide
+# 🎨 Anugruja Arts Studio — Master Admin Console & CMS User Guide
 
-Welcome to the **Anugraha Arts Studio Autonomous Admin Console**. This application is an independent, private repository (`abhay2008/AnugrujaArtsStudio-Admin`) designed specifically for studio owners, curators, and administrators to manage artwork collections, pricing, customer leads, media uploads, and studio content with automated Git-backed persistence.
+Welcome to the **Anugruja Arts Studio Autonomous Admin Console**. This application is an independent, private repository (`abhay2008/AnugrujaArtsStudio-Admin`) designed specifically for studio owners, curators, and administrators to manage artwork collections, pricing, customer leads, media uploads, and studio content with automated Git-backed persistence.
 
 ---
 
@@ -29,7 +29,7 @@ This portal is fully optimized for GitHub's modern **Fine-Grained Personal Acces
 1. Log into your GitHub account (`abhay2008`).
 2. Go to **Settings** &gt; **Developer settings** &gt; **Personal access tokens** &gt; **Fine-grained tokens** (or visit [github.com/settings/tokens?type=beta](https://github.com/settings/tokens?type=beta)).
 3. Click **"Generate new token"**.
-4. Set a name: `Anugraha-Admin-PAT`.
+4. Set a name: `Anugruja-Admin-PAT`.
 5. Under **Repository access**, choose **"Only select repositories"** and select:
    - `AnugrujaArtsStudio` (Public Showcase)
    - `AnugrujaArtsStudio-Admin` (Admin Console)

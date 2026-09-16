@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import LoginClient from './LoginClient';
 
 export const metadata = {
-  title: 'Admin Login — Anugraha Arts Studio',
+  title: 'Admin Login — Anugruja Arts Studio',
 };
 
 export default function LoginPage() {

@@ -4,7 +4,7 @@ export const SESSION_DURATION_SECONDS = 60 * 60 * 24; // 24 hours
 function getSecretKey(): string {
   return (
     process.env.SESSION_SECRET ||
-    'anugraha_arts_studio_secret_session_key_2026_super_secure'
+    'anugruja_arts_studio_secret_session_key_2026_super_secure'
   );
 }
 

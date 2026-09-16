@@ -168,7 +168,7 @@ export default function TokenConfigModal({ isOpen, onClose }: TokenConfigModalPr
                   GitHub Fine-grained Tokens Settings <ExternalLink className="w-3 h-3 inline" />
                 </a>
               </li>
-              <li>Click <strong>&quot;Generate new token&quot;</strong> and name it (e.g. <code>Anugraha-Admin</code>).</li>
+              <li>Click <strong>&quot;Generate new token&quot;</strong> and name it (e.g. <code>Anugruja-Admin</code>).</li>
               <li>Under <strong>Repository access</strong>: select <strong>&quot;Only select repositories&quot;</strong> and choose <code>AnugrujaArtsStudio</code>.</li>
               <li>
                 Under <strong>Permissions &gt; Repository permissions</strong>:

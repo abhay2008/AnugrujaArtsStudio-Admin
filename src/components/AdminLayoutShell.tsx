@@ -34,7 +34,7 @@ export default function AdminLayoutShell({ children }: { children: React.ReactNo
         </main>
         <footer className="border-t border-studio-gold/15 py-4 text-center text-xs text-zinc-500">
           <p>
-            © 2026 Anugraha Arts Studio · <span className="font-cinzel tracking-widest text-studio-gold/70">ATELIER CONSOLE</span>
+            © 2026 Anugruja Arts Studio · <span className="font-cinzel tracking-widest text-studio-gold/70">ATELIER CONSOLE</span>
           </p>
         </footer>
 

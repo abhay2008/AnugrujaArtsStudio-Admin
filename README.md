@@ -1,6 +1,6 @@
-# 🏛️ Anugraha Arts Studio — Admin Portal & CMS
+# 🏛️ Anugruja Arts Studio — Admin Portal & CMS
 
-Autonomous Content & Gallery Management Console for **Anugraha Arts Studio**, designed for automated Git-backed publishing to GitHub.
+Autonomous Content & Gallery Management Console for **Anugruja Arts Studio**, designed for automated Git-backed publishing to GitHub.
 
 ## 🌟 Key Capabilities
 
@@ -39,7 +39,7 @@ GITHUB_REPO=AnugrujaArtsStudio
 GITHUB_ADMIN_REPO=AnugrujaArtsStudio-Admin
 GITHUB_BRANCH=main
 ADMIN_PASSWORD=REDACTED-SECRET-REMOVED-FROM-HISTORY
-SESSION_SECRET=anugraha_arts_studio_secret_session_key_2026
+SESSION_SECRET=anugruja_arts_studio_secret_session_key_2026
 DEVELOPMENT_LOCAL_SAVE=true
 ```
 

@@ -99,7 +99,7 @@ export default function InquiriesPage() {
   };
 
   const copyQuoteToClipboard = () => {
-    const text = `Namaste! Here is your custom artwork estimate from Anugraha Arts Studio:\n• Canvas Size: ${calcWidth}x${calcHeight} inches (${calcWidth * calcHeight} sq in)\n• Medium: ${calcMedium.toUpperCase()}\n• Framing: ${calcFrame.replace('_', ' ').toUpperCase()}\n• Estimated Investment: ₹${estimatedPrice.toLocaleString('en-IN')}\n\nIncludes artist consultation and certificate of authenticity.`;
+    const text = `Namaste! Here is your custom artwork estimate from Anugruja Arts Studio:\n• Canvas Size: ${calcWidth}x${calcHeight} inches (${calcWidth * calcHeight} sq in)\n• Medium: ${calcMedium.toUpperCase()}\n• Framing: ${calcFrame.replace('_', ' ').toUpperCase()}\n• Estimated Investment: ₹${estimatedPrice.toLocaleString('en-IN')}\n\nIncludes artist consultation and certificate of authenticity.`;
     navigator.clipboard.writeText(text);
     setCopiedQuote(true);
     setTimeout(() => setCopiedQuote(false), 3000);
@@ -264,7 +264,7 @@ export default function InquiriesPage() {
           filteredInquiries.map((inq) => {
             const cleanPhone = inq.phone.replace(/[^0-9]/g, '');
             const waText = encodeURIComponent(
-              `Namaste ${inq.customerName}! Thank you for your inquiry with Anugraha Arts Studio regarding "${inq.artworkTitle || inq.interest}". We would love to share full details and pricing with you.`
+              `Namaste ${inq.customerName}! Thank you for your inquiry with Anugruja Arts Studio regarding "${inq.artworkTitle || inq.interest}". We would love to share full details and pricing with you.`
             );
             const waUrl = `https://wa.me/${cleanPhone}?text=${waText}`;
 

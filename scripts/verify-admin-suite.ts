@@ -4,7 +4,7 @@ import { publishRepos, owner, publicRepo } from '../src/lib/github';
 import { Inquiry } from '../src/lib/types';
 
 async function runTests() {
-  console.log('🧪 Starting Anugraha Arts Studio Admin Suite Verification...\n');
+  console.log('🧪 Starting Anugruja Arts Studio Admin Suite Verification...\n');
 
   // Test 1: Admin Password & Session Auth
   console.log('--- Test 1: Admin Password & HMAC Session Auth ---');

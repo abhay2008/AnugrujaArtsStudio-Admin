@@ -97,7 +97,7 @@ export default function DashboardPage() {
               Autonomous Studio Console
             </span>
             <h1 className="font-cinzel text-2xl sm:text-3xl font-bold text-white tracking-wide">
-              {content.brand?.name || 'Anugraha Arts Studio'}
+              {content.brand?.name || 'Anugruja Arts Studio'}
             </h1>
             <p className="text-xs sm:text-sm text-zinc-300/90 max-w-xl leading-relaxed">
               Curate gallery collections, process inquiries, upload high-res paintings, and deploy
@@ -228,7 +228,7 @@ export default function DashboardPage() {
             {inquiries.slice(0, 3).map((inq) => {
               const cleanPhone = inq.phone.replace(/[^0-9]/g, '');
               const waText = encodeURIComponent(
-                `Namaste ${inq.customerName}! Thank you for your inquiry with Anugraha Arts Studio regarding ${inq.artworkTitle || inq.interest}. How can I assist you with your requirements?`
+                `Namaste ${inq.customerName}! Thank you for your inquiry with Anugruja Arts Studio regarding ${inq.artworkTitle || inq.interest}. How can I assist you with your requirements?`
               );
               const waUrl = `https://wa.me/${cleanPhone}?text=${waText}`;
 
