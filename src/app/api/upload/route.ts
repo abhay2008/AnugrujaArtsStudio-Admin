@@ -23,11 +23,17 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(base64Data, 'base64');
     const relPath = path.join('images', fileName);
 
-    // 1. Save to local admin public/images/
+    // 1. Save to local admin public/images/ (best-effort — read-only on serverless)
     const localTarget = path.join(process.cwd(), 'public', 'images', fileName);
-    const localDir = path.dirname(localTarget);
-    if (!fs.existsSync(localDir)) fs.mkdirSync(localDir, { recursive: true });
-    fs.writeFileSync(localTarget, buffer);
+    let localSaved = false;
+    try {
+      const localDir = path.dirname(localTarget);
+      if (!fs.existsSync(localDir)) fs.mkdirSync(localDir, { recursive: true });
+      fs.writeFileSync(localTarget, buffer);
+      localSaved = true;
+    } catch (writeErr: any) {
+      console.warn('Local image write skipped:', writeErr.code || writeErr.message);
+    }
 
     // 2. Mirror save to sibling public repo if running locally
     if (process.env.DEVELOPMENT_LOCAL_SAVE !== 'false') {
@@ -72,6 +78,7 @@ export async function POST(req: NextRequest) {
       src: `/images/${fileName}`,
       fileName,
       sizeBytes: buffer.length,
+      localSaved,
       commitResult,
     });
   } catch (err: any) {

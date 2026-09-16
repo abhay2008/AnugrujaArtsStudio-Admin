@@ -3,6 +3,23 @@ import path from 'path';
 import { SiteContent, Inquiry } from './types';
 import { commitTextFile, getRemoteTextFile } from './github';
 
+/**
+ * Best-effort local write. Serverless filesystems (e.g. Vercel's /var/task)
+ * are read-only, so local persistence must never be allowed to break a save
+ * whose real destination is the GitHub commit.
+ */
+function tryWriteFile(target: string, data: string | Buffer): boolean {
+  try {
+    const dir = path.dirname(target);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(target, data);
+    return true;
+  } catch (err: any) {
+    console.warn(`Local write skipped for ${target}:`, err.code || err.message);
+    return false;
+  }
+}
+
 const LOCAL_CONTENT_PATH = path.join(process.cwd(), 'content', 'site.json');
 const SIBLING_CONTENT_PATH = path.join(process.cwd(), '..', 'AnugrujaArtsStudio', 'content', 'site.json');
 
@@ -45,21 +62,13 @@ export async function saveContent(
   content.lastUpdated = new Date().toISOString();
   const jsonStr = JSON.stringify(content, null, 2);
 
-  // 1. Save to local admin file
-  const dir = path.dirname(LOCAL_CONTENT_PATH);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(LOCAL_CONTENT_PATH, jsonStr, 'utf8');
+  // 1. Save to local admin file (best-effort — read-only on serverless)
+  const localSaved = tryWriteFile(LOCAL_CONTENT_PATH, jsonStr);
 
   // 2. Mirror save to sibling public repo if running locally on disk
+  let siblingSaved = false;
   if (process.env.DEVELOPMENT_LOCAL_SAVE !== 'false') {
-    try {
-      const siblingDir = path.dirname(SIBLING_CONTENT_PATH);
-      if (fs.existsSync(siblingDir)) {
-        fs.writeFileSync(SIBLING_CONTENT_PATH, jsonStr, 'utf8');
-      }
-    } catch (siblingErr) {
-      console.warn('Could not sync to sibling repo path:', siblingErr);
-    }
+    siblingSaved = tryWriteFile(SIBLING_CONTENT_PATH, jsonStr);
   }
 
   // 3. Commit to GitHub if token configured
@@ -74,6 +83,8 @@ export async function saveContent(
     success: true,
     lastUpdated: content.lastUpdated,
     commitResult,
+    localSaved,
+    siblingSaved,
   };
 }
 
@@ -90,8 +101,6 @@ export function loadInquiries(): Inquiry[] {
 }
 
 export function saveInquiries(inquiries: Inquiry[]) {
-  const dir = path.dirname(LOCAL_INQUIRIES_PATH);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(LOCAL_INQUIRIES_PATH, JSON.stringify(inquiries, null, 2), 'utf8');
-  return { success: true, count: inquiries.length };
+  const saved = tryWriteFile(LOCAL_INQUIRIES_PATH, JSON.stringify(inquiries, null, 2));
+  return { success: true, count: inquiries.length, saved };
 }
