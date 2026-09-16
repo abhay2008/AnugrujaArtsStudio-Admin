@@ -2,7 +2,10 @@
   "name": "anugruja-arts-studio-admin",
   "version": "1.0.0",
   "private": true,
-  "description": "Exclusive Content & Artwork Management Portal for Anugraha Arts Studio",
+  "engines": {
+    "node": "24.x"
+  },
+  "description": "Exclusive Content & Artwork Management Portal for Anugruja Arts Studio",
   "scripts": {
     "dev": "next dev -p 3002",
     "build": "next build",
@@ -20,7 +23,7 @@
     "sharp": "^0.35.4"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
+    "@types/node": "^24.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "autoprefixer": "^10.4.19",
