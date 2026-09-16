@@ -9,12 +9,24 @@ function getSecretKey(): string {
 }
 
 function getExpectedPassword(): string {
-  return process.env.ADMIN_PASSWORD || 'REDACTED-SECRET-REMOVED-FROM-HISTORY';
+  const password = process.env.ADMIN_PASSWORD?.trim();
+  if (!password) {
+    // Fail closed: never ship a built-in fallback password.
+    throw new Error(
+      'ADMIN_PASSWORD environment variable is not set. ' +
+        'Configure it in Vercel Project Settings (or .env.local for local dev).'
+    );
+  }
+  return password;
 }
 
 export function checkAdminPassword(provided: string): boolean {
   if (!provided) return false;
-  return provided === getExpectedPassword();
+  try {
+    return provided === getExpectedPassword();
+  } catch {
+    return false; // ADMIN_PASSWORD unconfigured — reject all attempts
+  }
 }
 
 /**

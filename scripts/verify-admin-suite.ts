@@ -8,7 +8,11 @@ async function runTests() {
 
   // Test 1: Admin Password & Session Auth
   console.log('--- Test 1: Admin Password & HMAC Session Auth ---');
-  const validPass = checkAdminPassword('REDACTED-SECRET-REMOVED-FROM-HISTORY');
+  const adminPass = process.env.ADMIN_PASSWORD;
+  if (!adminPass) {
+    throw new Error('ADMIN_PASSWORD not set — export it from .env.local before running this suite.');
+  }
+  const validPass = checkAdminPassword(adminPass);
   const invalidPass = checkAdminPassword('wrongpassword');
   console.log(`[AUTH] Correct password check: ${validPass ? 'PASS' : 'FAIL'}`);
   console.log(`[AUTH] Wrong password rejection: ${!invalidPass ? 'PASS' : 'FAIL'}`);

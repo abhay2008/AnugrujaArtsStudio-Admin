@@ -17,7 +17,7 @@ The system utilizes an automated **Git-backed Headless CMS** pattern:
 ## 🔐 Authentication & Session Security
 
 - **Login Route**: `/login` (all protected routes automatically redirect here).
-- **Default Password**: `REDACTED-SECRET-REMOVED-FROM-HISTORY` (configurable via `ADMIN_PASSWORD` in `.env.local`).
+- **Admin Password**: configured via the `ADMIN_PASSWORD` environment variable in `.env.local` / Vercel Project Settings (required — no built-in default).
 - **Session Duration**: 24 hours. Signed with HMAC-SHA256 Web Crypto token in an HTTP-only secure cookie (`anugruja_admin_session`).
 
 ---

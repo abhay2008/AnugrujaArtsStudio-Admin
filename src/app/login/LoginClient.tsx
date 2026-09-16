@@ -124,16 +124,15 @@ export default function LoginClient() {
           </button>
         </form>
 
-        {/* Hint / local development helper */}
-        <div className="mt-8 pt-4 border-t border-studio-gold/15 text-center">
-          <p className="text-[11px] text-zinc-400 flex items-center justify-center gap-1.5">
-            <Key className="w-3.5 h-3.5 text-studio-gold" />
-            <span>
-              Default admin password:{' '}
-              <code className="font-mono text-studio-gold">REDACTED-SECRET-REMOVED-FROM-HISTORY</code>
-            </span>
-          </p>
-        </div>
+        {/* Local development helper — only rendered outside production */}
+        {process.env.NODE_ENV !== 'production' && (
+          <div className="mt-8 pt-4 border-t border-studio-gold/15 text-center">
+            <p className="text-[11px] text-zinc-400 flex items-center justify-center gap-1.5">
+              <Key className="w-3.5 h-3.5 text-studio-gold" />
+              <span>Password comes from ADMIN_PASSWORD in your .env.local</span>
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

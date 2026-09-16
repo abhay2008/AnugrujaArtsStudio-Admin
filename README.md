@@ -26,7 +26,7 @@ http://localhost:3002
 ```
 
 Default credentials:
-- Password: `REDACTED-SECRET-REMOVED-FROM-HISTORY`
+- Password: configured via the `ADMIN_PASSWORD` environment variable (required — no built-in default)
 
 ## 📦 Environment Variables
 
@@ -38,7 +38,7 @@ GITHUB_OWNER=abhay2008
 GITHUB_REPO=AnugrujaArtsStudio
 GITHUB_ADMIN_REPO=AnugrujaArtsStudio-Admin
 GITHUB_BRANCH=main
-ADMIN_PASSWORD=REDACTED-SECRET-REMOVED-FROM-HISTORY
+ADMIN_PASSWORD=<your-admin-password>
 SESSION_SECRET=anugruja_arts_studio_secret_session_key_2026
 DEVELOPMENT_LOCAL_SAVE=true
 ```
