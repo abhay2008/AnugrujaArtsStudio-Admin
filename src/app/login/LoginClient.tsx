@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Lock, Key, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
+import { Lock, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
 
 export default function LoginClient() {
   const router = useRouter();
@@ -67,7 +67,7 @@ export default function LoginClient() {
               ANUGRUJA
             </h1>
             <p className="text-[10px] text-amber-200/60 tracking-[0.34em] uppercase font-sans mt-1.5">
-              Atelier Console
+              Studio Manager
             </p>
           </div>
         </div>
@@ -76,7 +76,7 @@ export default function LoginClient() {
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-1.5">
             <label className="admin-label" htmlFor="admin-password">
-              Master Admin Password
+Studio Password
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
@@ -117,22 +117,16 @@ export default function LoginClient() {
               </>
             ) : (
               <>
-                <span>Access Admin Console</span>
+                <span>Open Studio Manager</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>
         </form>
 
-        {/* Local development helper — only rendered outside production */}
-        {process.env.NODE_ENV !== 'production' && (
-          <div className="mt-8 pt-4 border-t border-studio-gold/15 text-center">
-            <p className="text-[11px] text-zinc-400 flex items-center justify-center gap-1.5">
-              <Key className="w-3.5 h-3.5 text-studio-gold" />
-              <span>Password comes from ADMIN_PASSWORD in your .env.local</span>
-            </p>
-          </div>
-        )}
+        <p className="mt-8 text-center text-[11px] text-zinc-500">
+          Private access for the studio team
+        </p>
       </div>
     </div>
   );

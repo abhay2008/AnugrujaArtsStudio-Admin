@@ -8,37 +8,33 @@ import {
   Images,
   UploadCloud,
   FileText,
-  MessageSquare,
-  GitBranch,
+  CalendarDays,
   LogOut,
   Sparkles,
   Menu,
   X,
   ExternalLink,
   ShieldCheck,
-  Key,
 } from 'lucide-react';
 import { useSite } from '@/context/SiteContext';
 
 interface AdminNavProps {
   onOpenReviewModal: () => void;
-  onOpenTokenModal: () => void;
 }
 
-export default function AdminNav({ onOpenReviewModal, onOpenTokenModal }: AdminNavProps) {
+export default function AdminNav({ onOpenReviewModal }: AdminNavProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { hasUnsavedChanges, dirtyCount, tokenOverride } = useSite();
+  const { hasUnsavedChanges, dirtyCount } = useSite();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
   const navItems = [
-    { href: '/', label: 'Overview', icon: LayoutDashboard },
-    { href: '/galleries', label: 'Galleries', icon: Images },
-    { href: '/upload', label: 'Mass Upload', icon: UploadCloud },
-    { href: '/content', label: 'Content & Profile', icon: FileText },
-    { href: '/inquiries', label: 'Inquiries & Leads', icon: MessageSquare },
-    { href: '/github', label: 'GitHub Sync & PAT', icon: GitBranch },
+    { href: '/', label: 'Studio Home', icon: LayoutDashboard },
+    { href: '/galleries', label: 'Paintings & Collections', icon: Images },
+    { href: '/upload', label: 'Add New Work', icon: UploadCloud },
+    { href: '/content', label: 'Studio Details', icon: FileText },
+    { href: '/events', label: 'Events & Workshops', icon: CalendarDays },
   ];
 
   const handleLogout = async () => {
@@ -76,7 +72,7 @@ export default function AdminNav({ onOpenReviewModal, onOpenTokenModal }: AdminN
                   ANUGRUJA
                 </span>
                 <span className="text-[9px] tracking-[0.3em] text-amber-200/50 uppercase font-sans font-semibold">
-                  Atelier Console
+                  Studio Manager
                 </span>
               </div>
             </Link>
@@ -106,19 +102,7 @@ export default function AdminNav({ onOpenReviewModal, onOpenTokenModal }: AdminN
 
           {/* Right action bar */}
           <div className="flex items-center gap-2 sm:gap-2.5">
-            {/* Fine-grained token quick status */}
-            <button
-              onClick={onOpenTokenModal}
-              title="Configure GitHub Fine-Grained Access Token"
-              className={`admin-pill ${
-                tokenOverride ? 'admin-pill--green' : 'admin-pill--amber'
-              } hover:brightness-125 transition-all cursor-pointer`}
-            >
-              <Key className="w-3 h-3" />
-              <span className="hidden sm:inline">{tokenOverride ? 'PAT Active' : 'PAT Setup'}</span>
-            </button>
-
-            {/* Unsaved changes / commit CTA */}
+            {/* Unsaved changes / publish CTA */}
             {hasUnsavedChanges ? (
               <button
                 onClick={onOpenReviewModal}
@@ -126,13 +110,13 @@ export default function AdminNav({ onOpenReviewModal, onOpenTokenModal }: AdminN
               >
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>
-                  Review &amp; Commit ({dirtyCount})
+                  Review &amp; Publish ({dirtyCount})
                 </span>
               </button>
             ) : (
               <div className="admin-pill admin-pill--green hidden lg:inline-flex">
                 <ShieldCheck className="w-3 h-3" />
-                <span>In Sync</span>
+                <span>Website Up to Date</span>
               </div>
             )}
 
@@ -141,10 +125,10 @@ export default function AdminNav({ onOpenReviewModal, onOpenTokenModal }: AdminN
               href="http://localhost:3000"
               target="_blank"
               rel="noreferrer"
-              title="View Public Site (opens port 3000)"
+              title="Open the public website"
               className="admin-btn-ghost !rounded-full !px-3 !py-2 !text-xs hidden lg:inline-flex"
             >
-              <span>Public Site</span>
+              <span>View Website</span>
               <ExternalLink className="w-3 h-3" />
             </a>
 
@@ -194,16 +178,6 @@ export default function AdminNav({ onOpenReviewModal, onOpenTokenModal }: AdminN
           })}
 
           <div className="pt-2 border-t border-studio-gold/15 mt-2 flex flex-col gap-1">
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenTokenModal();
-              }}
-              className="flex items-center gap-2 px-3 py-2.5 text-sm text-zinc-300 hover:text-studio-gold"
-            >
-              <Key className="w-4 h-4 text-studio-gold" />
-              <span>Configure GitHub Fine-Grained Token</span>
-            </button>
             <a
               href="http://localhost:3000"
               target="_blank"
@@ -211,7 +185,7 @@ export default function AdminNav({ onOpenReviewModal, onOpenTokenModal }: AdminN
               className="flex items-center gap-2 px-3 py-2.5 text-sm text-zinc-300 hover:text-studio-gold"
             >
               <ExternalLink className="w-4 h-4 text-studio-gold" />
-              <span>View Public Studio Site</span>
+              <span>View Public Website</span>
             </a>
           </div>
         </div>

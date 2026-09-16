@@ -61,7 +61,7 @@ export default function DeleteArtworkModal({
           </div>
         </div>        <p className="text-xs text-[color:var(--ink-muted)] leading-relaxed">
           Are you sure you want to remove this painting from the{' '}
-          <strong className="text-[color:var(--ink)]">{galleryKey}</strong> collection? The change will be staged in your dashboard until you review and commit.
+          <strong className="text-[color:var(--ink)]">{galleryKey}</strong> collection? The change will wait for your review before the website is updated.
         </p>
 
         {/* Action Buttons */}

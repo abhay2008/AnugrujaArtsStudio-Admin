@@ -4,7 +4,7 @@ export const GALLERIES_META: GalleryMeta[] = [
   {
     key: 'sale',
     label: 'Art for Sale',
-    description: 'Paintings catalog available for direct purchase & collector inquiries',
+    description: 'Paintings catalog available for direct purchase and collector requests',
     defaultCategory: 'Paintings for Sale',
     iconName: 'ShoppingBag',
     accentColor: 'from-amber-500/20 to-amber-700/10 text-amber-300 border-amber-500/30',

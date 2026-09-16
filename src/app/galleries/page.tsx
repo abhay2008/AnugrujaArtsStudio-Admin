@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { useSite } from '@/context/SiteContext';
 import { GALLERIES_META } from '@/data/galleriesData';
-import { GalleryKey, Artwork } from '@/lib/types';
+import { ArtworkStatus, GalleryKey, Artwork, galleryCatalogEntry } from '@/lib/types';
 import DeleteArtworkModal from '@/components/DeleteArtworkModal';
 
 function GalleryManagerContent() {
@@ -41,7 +41,7 @@ function GalleryManagerContent() {
 
   const [selectedGallery, setSelectedGallery] = useState<GalleryKey>(initialGallery);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'available' | 'sold' | 'reserved'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'Available' | 'Sold' | 'Reserved'>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
   // Deletion modal state
@@ -50,19 +50,19 @@ function GalleryManagerContent() {
   // New artwork drawer / form state
   const [isAddingArtwork, setIsAddingArtwork] = useState(false);
   const [newArtTitle, setNewArtTitle] = useState('');
-  const [newArtMedium, setNewArtMedium] = useState('Watercolor on Archival Paper');
-  const [newArtPrice, setNewArtPrice] = useState('₹18,000');
-  const [newArtDimensions, setNewArtDimensions] = useState('20x28 in');
-  const [newArtCategory, setNewArtCategory] = useState('Painting');
+  const [newArtMedium, setNewArtMedium] = useState('');
+  const [newArtPrice, setNewArtPrice] = useState('');
+  const [newArtDimensions, setNewArtDimensions] = useState('');
+  const [newArtCategory, setNewArtCategory] = useState('');
   const [newArtSrc, setNewArtSrc] = useState('/images/banner.jpeg');
-  const [newArtStatus, setNewArtStatus] = useState<'available' | 'sold' | 'reserved'>('available');
+  const [newArtStatus, setNewArtStatus] = useState<ArtworkStatus | ''>('');
 
   // Editing in-place state
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [editPrice, setEditPrice] = useState('');
   const [editMedium, setEditMedium] = useState('');
-  const [editStatus, setEditStatus] = useState<'available' | 'sold' | 'reserved'>('available');
+  const [editStatus, setEditStatus] = useState<ArtworkStatus | ''>('');
 
   const galleryList = content?.galleries[selectedGallery] || [];
 
@@ -74,26 +74,30 @@ function GalleryManagerContent() {
         (art.price !== undefined && String(art.price).toLowerCase().includes(searchQuery.toLowerCase()));
 
       const matchStatus =
-        filterStatus === 'all' || (art.status || 'available') === filterStatus;
+        filterStatus === 'all' || art.status === filterStatus;
 
       return matchSearch && matchStatus;
     });
   }, [galleryList, searchQuery, filterStatus]);
+
+  const selectedMeta = galleryCatalogEntry(selectedGallery);
 
   const handleStartEdit = (art: Artwork) => {
     setEditingId(art.id);
     setEditTitle(art.title);
     setEditPrice(art.price !== undefined ? String(art.price) : '');
     setEditMedium(art.medium || '');
-    setEditStatus(art.status || 'available');
+    setEditStatus(art.status || '');
   };
 
   const handleSaveEdit = (id: string) => {
+    // On showcase collections price/status are not meaningful — clear them
+    // instead of persisting junk. Blank price on sale = price on request.
     updateArtwork(selectedGallery, id, {
       title: editTitle,
-      price: editPrice,
-      medium: editMedium,
-      status: editStatus,
+      price: selectedMeta.sellable && editPrice ? editPrice : undefined,
+      medium: editMedium || undefined,
+      status: selectedMeta.sellable && editStatus ? editStatus : undefined,
     });
     setEditingId(null);
   };
@@ -105,12 +109,12 @@ function GalleryManagerContent() {
     const newArt: Artwork = {
       id: `art-${Date.now()}`,
       title: newArtTitle,
-      category: newArtCategory,
-      medium: newArtMedium,
-      price: newArtPrice,
-      dimensions: newArtDimensions,
+      category: newArtCategory || selectedMeta.defaultCategory,
+      medium: newArtMedium || undefined,
+      price: selectedMeta.sellable && newArtPrice ? newArtPrice : undefined,
+      dimensions: newArtDimensions || undefined,
       src: newArtSrc,
-      status: newArtStatus,
+      status: selectedMeta.sellable && newArtStatus ? newArtStatus : undefined,
     };
 
     addArtwork(selectedGallery, newArt);
@@ -202,9 +206,9 @@ function GalleryManagerContent() {
             className="admin-input px-3 py-1.5 text-xs w-auto sm:w-auto"
           >
             <option value="all">All Statuses</option>
-            <option value="available">Available for Sale</option>
-            <option value="sold">Sold</option>
-            <option value="reserved">Reserved</option>
+            <option value="Available">Available for Sale</option>
+            <option value="Sold">Sold</option>
+            <option value="Reserved">Reserved</option>
           </select>
 
           {/* View Mode Switcher */}
@@ -271,18 +275,20 @@ function GalleryManagerContent() {
                   <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-black/70 text-studio-gold border border-[color:var(--hairline-strong)]">
                     #{idx + 1}
                   </span>
-                  {/* Status Badge */}
-                  <span
-                    className={`absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider backdrop-blur-sm ${
-                      art.status === 'sold'
-                        ? 'bg-rose-500/15 text-rose-200 border border-rose-400/30'
-                        : art.status === 'reserved'
-                        ? 'bg-amber-500/15 text-amber-200 border border-amber-400/30'
-                        : 'bg-emerald-500/15 text-emerald-200 border border-emerald-400/30'
-                    }`}
-                  >
-                    {art.status || 'available'}
-                  </span>
+                  {/* Status Badge — only on sellable collections */}
+                  {selectedMeta.sellable && (
+                    <span
+                      className={`absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider backdrop-blur-sm ${
+                        art.status === 'Sold'
+                          ? 'bg-rose-500/15 text-rose-200 border border-rose-400/30'
+                          : art.status === 'Reserved'
+                          ? 'bg-amber-500/15 text-amber-200 border border-amber-400/30'
+                          : 'bg-emerald-500/15 text-emerald-200 border border-emerald-400/30'
+                      }`}
+                    >
+                      {art.status}
+                    </span>
+                  )}
                 </div>
 
                 {/* Details / In-Place Editor */}
@@ -310,15 +316,18 @@ function GalleryManagerContent() {
                         placeholder="Medium (e.g. Oil on Canvas)"
                         className="admin-input text-xs"
                       />
-                      <select
-                        value={editStatus}
-                        onChange={(e) => setEditStatus(e.target.value as any)}
-                        className="admin-input text-xs"
-                      >
-                        <option value="available">Available</option>
-                        <option value="sold">Sold</option>
-                        <option value="reserved">Reserved</option>
-                      </select>
+                      {selectedMeta.sellable && (
+                        <select
+                          value={editStatus}
+                          onChange={(e) => setEditStatus(e.target.value as any)}
+                          className="admin-input text-xs"
+                        >
+                          <option value="">No availability label</option>
+                          <option value="Available">Available</option>
+                          <option value="Sold">Sold</option>
+                          <option value="Reserved">Reserved</option>
+                        </select>
+                      )}
 
                       <div className="flex items-center gap-2 pt-1">
                         <button
@@ -469,15 +478,19 @@ function GalleryManagerContent() {
                     {art.price || 'Price on Request'}
                   </td>
                   <td className="p-3">
-                    <span
-                      className={`admin-pill ${
-                        art.status === 'sold'
-                          ? 'admin-pill--rose'
-                          : 'admin-pill--green'
-                      }`}
-                    >
-                      {art.status || 'available'}
-                    </span>
+                    {selectedMeta.sellable ? (
+                      <span
+                        className={`admin-pill ${
+                          (art.status || 'Available') === 'Sold'
+                            ? 'admin-pill--rose'
+                            : 'admin-pill--green'
+                        }`}
+                      >
+                        {art.status || 'No label'}
+                      </span>
+                    ) : (
+                      <span className="text-[11px] text-zinc-500">—</span>
+                    )}
                   </td>
                   <td className="p-3 text-center">
                     <div className="flex items-center justify-center gap-1 text-zinc-400">
@@ -567,12 +580,12 @@ function GalleryManagerContent() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="admin-label">Price (INR / USD)</label>
+                  <label className="admin-label">{selectedMeta.sellable ? 'Price (blank = on request)' : 'Price (showcase — leave blank)'}</label>
                   <input
                     type="text"
                     value={newArtPrice}
                     onChange={(e) => setNewArtPrice(e.target.value)}
-                    placeholder="e.g. ₹24,000"
+                    placeholder={selectedMeta.sellable ? 'e.g. ₹24,000' : '—'}
                     className="admin-input"
                   />
                 </div>
@@ -589,31 +602,34 @@ function GalleryManagerContent() {
                     className="admin-input"
                   />
                 </div>
-                <div className="space-y-1">
-                  <label className="admin-label">Availability Status</label>
-                  <select
-                    value={newArtStatus}
-                    onChange={(e) => setNewArtStatus(e.target.value as any)}
-                    className="admin-input"
-                  >
-                    <option value="available">Available for Sale</option>
-                    <option value="sold">Sold</option>
-                    <option value="reserved">Reserved</option>
-                  </select>
-                </div>
+                {selectedMeta.sellable && (
+                  <div className="space-y-1">
+                    <label className="admin-label">Availability Status</label>
+                    <select
+                      value={newArtStatus}
+                      onChange={(e) => setNewArtStatus(e.target.value as any)}
+                      className="admin-input"
+                    >
+                      <option value="">No availability label</option>
+                      <option value="Available">Available for Sale</option>
+                      <option value="Sold">Sold</option>
+                      <option value="Reserved">Reserved</option>
+                    </select>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-1">
-                <label className="admin-label">Image Asset Path / URL</label>
+                <label className="admin-label">Photo location (optional)</label>
                 <input
                   type="text"
                   value={newArtSrc}
                   onChange={(e) => setNewArtSrc(e.target.value)}
-                  placeholder="/images/p1.jpeg or remote image URL"
+                  placeholder="e.g. /images/p1.jpeg"
                   className="admin-input font-mono text-xs"
                 />
                 <p className="text-[11px] text-[color:var(--ink-faint)]">
-                  Tip: Use Mass Upload Studio for drag & drop file uploads directly from your phone or desktop.
+                  Tip: Use Add New Work to choose photos directly from your phone or computer.
                 </p>
               </div>
 

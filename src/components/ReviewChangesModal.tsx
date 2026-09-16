@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import {
   X,
   Sparkles,
-  GitCommit,
+  UploadCloud,
   CheckCircle,
   AlertCircle,
   Loader2,
@@ -13,6 +13,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { useSite } from '@/context/SiteContext';
+import { galleryCatalogEntry } from '@/lib/types';
 
 interface ReviewChangesModalProps {
   isOpen: boolean;
@@ -21,17 +22,14 @@ interface ReviewChangesModalProps {
 
 export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesModalProps) {
   const {
+    content,
     stagedImages,
     dirtyCount,
     commitAllChanges,
     saving,
-    tokenOverride,
     removeStagedImage,
   } = useSite();
 
-  const [commitMessage, setCommitMessage] = useState(
-    `Admin update: sync gallery artworks and studio content (${new Date().toLocaleDateString()})`
-  );
   const [commitStatus, setCommitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -40,7 +38,7 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
   const handleCommit = async () => {
     setCommitStatus('idle');
     setErrorMessage('');
-    const res = await commitAllChanges(commitMessage);
+    const res = await commitAllChanges('Website update from Studio Manager');
     if (res.success) {
       setCommitStatus('success');
       setTimeout(() => {
@@ -49,7 +47,7 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
       }, 1600);
     } else {
       setCommitStatus('error');
-      setErrorMessage(res.error || 'Failed committing to GitHub');
+      setErrorMessage(res.error || 'The website could not be updated. Your changes are still safe to try again.');
     }
   };
 
@@ -60,14 +58,14 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
         <div className="flex items-center justify-between px-6 py-4 border-b border-[color:var(--hairline)] bg-black/25">
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-lg bg-studio-gold/20 text-studio-gold">
-              <GitCommit className="w-5 h-5" />
+              <UploadCloud className="w-5 h-5" />
             </div>
             <div>
               <h3 className="font-cinzel font-bold text-lg text-studio-gold">
-                Review & Commit Changes
+                Review & Publish Changes
               </h3>
               <p className="text-xs text-[color:var(--ink-muted)]">
-                {dirtyCount} pending modification{dirtyCount === 1 ? '' : 's'} ready for GitHub deployment
+                {dirtyCount} change{dirtyCount === 1 ? '' : 's'} ready to appear on the website
               </p>
             </div>
           </div>
@@ -88,7 +86,7 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
               <div className="flex items-center justify-between text-xs font-semibold text-studio-gold uppercase tracking-wider">
                 <span className="flex items-center gap-1.5">
                   <Images className="w-4 h-4" />
-                  Staged New Artworks ({stagedImages.length})
+                  New photos ({stagedImages.length})
                 </span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -106,15 +104,16 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-zinc-200 truncate">{img.title}</p>
                       <p className="text-xs text-studio-gold truncate">
-                        Gallery: <span className="text-amber-200 font-semibold">{img.targetGallery}</span>
+                        {galleryCatalogEntry(img.targetGallery).label}
+                        {img.status ? ` • ${img.status}` : ''}
                       </p>
                       <p className="text-[11px] text-[color:var(--ink-muted)]">
-                        {img.price} • {Math.round(img.sizeBytes / 1024)} KB
+                        {img.price || 'Price on request'} • {Math.round(img.sizeBytes / 1024)} KB
                       </p>
                     </div>
                     <button
                       onClick={() => removeStagedImage(img.id)}
-                      title="Remove from staging"
+                      title="Remove this photo"
                       className="text-[color:var(--ink-faint)] hover:text-rose-400 p-1 transition-colors"
                     >
                       <X className="w-4 h-4" />
@@ -125,41 +124,26 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
             </div>
           )}
 
-          {/* Content & Metadata Changes */}
+          {/* Event and gallery context summary */}
+          {content?.events && (
+            <div className="p-3.5 rounded-xl bg-black/25 border border-[color:var(--hairline)] text-xs space-y-1.5">
+              <p className="font-semibold text-studio-gold">Live website calendar included</p>
+              <p className="text-[color:var(--ink-muted)]">
+                {content.events.upcoming.length} upcoming event{content.events.upcoming.length === 1 ? '' : 's'} · {content.events.past.length} past event{content.events.past.length === 1 ? '' : 's'}
+              </p>
+            </div>
+          )}
+
+          {/* Plain-language publishing summary */}
           <div className="space-y-3">
             <div className="text-xs font-semibold text-studio-gold uppercase tracking-wider flex items-center gap-1.5">
               <Settings className="w-4 h-4" />
-              Content Modifications
+              Before you publish
             </div>
             <div className="p-3.5 rounded-xl bg-black/25 border border-[color:var(--hairline)] text-xs text-[color:var(--ink)] space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[color:var(--ink-muted)]">Target Repository:</span>
-                <span className="font-mono text-studio-gold">abhay2008/AnugrujaArtsStudio (main)</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-[color:var(--ink-muted)]">Persistence Mode:</span>
-                <span className="text-emerald-400">Direct Git Contents API + Local Sibling Mirror</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-[color:var(--ink-muted)]">Access Token:</span>                  <span className="text-[color:var(--ink-faint)] font-mono">
-                    {tokenOverride ? 'Fine-Grained PAT Active' : 'Default Repo Token'}
-                  </span>
-              </div>
+              <p>These changes will update the public website, including the gallery, event information, and studio details you edited.</p>
+              <p className="text-[color:var(--ink-muted)]">You can remove any photo above before publishing. After publishing, the website assistant will also learn the new information automatically.</p>
             </div>
-          </div>
-
-          {/* Commit Message Authoring */}
-          <div className="space-y-2">
-            <label className="block text-xs font-medium text-[color:var(--ink)]">
-              GitHub Commit Message
-            </label>
-            <textarea
-              value={commitMessage}
-              onChange={(e) => setCommitMessage(e.target.value)}
-              rows={2}
-              className="admin-input resize-none font-mono text-sm"
-              placeholder="Descriptive summary of artworks and content changes..."
-            />
           </div>
 
           {/* Error Message */}
@@ -174,7 +158,7 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
           {commitStatus === 'success' && (
             <div className="flex items-center gap-2 p-3 bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 rounded-xl text-xs">
               <CheckCircle className="w-4 h-4 flex-none" />
-              <span>Successfully committed changes directly to GitHub!</span>
+              <span>Website updated successfully. Your new information is now live.</span>
             </div>
           )}
         </div>
@@ -198,11 +182,11 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
             {saving ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Committing to GitHub...</span>
+                <span>Updating the website...</span>
               </>
             ) : (
               <>
-                <span>Publish to GitHub</span>
+                <span>Publish Changes</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}

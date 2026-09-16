@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { SiteContent, Inquiry } from './types';
-import { commitTextFile, getRemoteTextFile } from './github';
+import { SiteContent } from './types';
+import { commitTextFile, getRemoteTextFile, githubConfigured } from './github';
 
 /**
  * Best-effort local write. Serverless filesystems (e.g. Vercel's /var/task)
@@ -23,8 +23,6 @@ function tryWriteFile(target: string, data: string | Buffer): boolean {
 const LOCAL_CONTENT_PATH = path.join(process.cwd(), 'content', 'site.json');
 const SIBLING_CONTENT_PATH = path.join(process.cwd(), '..', 'AnugrujaArtsStudio', 'content', 'site.json');
 
-const LOCAL_INQUIRIES_PATH = path.join(process.cwd(), 'content', 'inquiries.json');
-
 export function getLocalContent(): SiteContent | null {
   try {
     if (fs.existsSync(LOCAL_CONTENT_PATH)) {
@@ -33,6 +31,17 @@ export function getLocalContent(): SiteContent | null {
     }
   } catch (err) {
     console.error('Failed reading local site.json:', err);
+  }
+  return null;
+}
+
+function getSiblingContent(): SiteContent | null {
+  try {
+    if (fs.existsSync(SIBLING_CONTENT_PATH)) {
+      return JSON.parse(fs.readFileSync(SIBLING_CONTENT_PATH, 'utf8')) as SiteContent;
+    }
+  } catch (err) {
+    console.warn('Could not read sibling public-site content:', err);
   }
   return null;
 }
@@ -49,7 +58,18 @@ export async function loadContent(tokenOverride?: string): Promise<SiteContent> 
   }
 
   const local = getLocalContent();
+  const sibling = getSiblingContent();
+  if (local && sibling) {
+    // Keep admin-local edits, but fill newer structured CMS domains when the
+    // local checkout predates events/chatbot support.
+    return {
+      ...local,
+      events: local.events ?? sibling.events,
+      chatbot: local.chatbot ?? sibling.chatbot,
+    };
+  }
   if (local) return local;
+  if (sibling) return sibling;
 
   throw new Error('site.json not found in content directory');
 }
@@ -77,6 +97,13 @@ export async function saveContent(
     commitResult = await commitTextFile('content/site.json', jsonStr, commitMessage, tokenOverride);
   } catch (githubErr: any) {
     console.warn('GitHub commit skipped or failed:', githubErr.message);
+    if (githubConfigured(tokenOverride) && !localSaved && !siblingSaved) {
+      throw new Error(`Could not publish site content to GitHub: ${githubErr.message}`);
+    }
+  }
+
+  if (githubConfigured(tokenOverride) && !commitResult) {
+    throw new Error('GitHub publishing did not complete. Your staged changes are still safe to retry.');
   }
 
   return {
@@ -86,21 +113,4 @@ export async function saveContent(
     localSaved,
     siblingSaved,
   };
-}
-
-export function loadInquiries(): Inquiry[] {
-  try {
-    if (fs.existsSync(LOCAL_INQUIRIES_PATH)) {
-      const raw = fs.readFileSync(LOCAL_INQUIRIES_PATH, 'utf8');
-      return JSON.parse(raw);
-    }
-  } catch (err) {
-    console.error('Failed reading inquiries.json:', err);
-  }
-  return [];
-}
-
-export function saveInquiries(inquiries: Inquiry[]) {
-  const saved = tryWriteFile(LOCAL_INQUIRIES_PATH, JSON.stringify(inquiries, null, 2));
-  return { success: true, count: inquiries.length, saved };
 }

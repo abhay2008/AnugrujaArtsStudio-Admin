@@ -1,6 +1,6 @@
 # 🎨 Anugruja Arts Studio — Master Admin Console & CMS User Guide
 
-Welcome to the **Anugruja Arts Studio Autonomous Admin Console**. This application is an independent, private repository (`abhay2008/AnugrujaArtsStudio-Admin`) designed specifically for studio owners, curators, and administrators to manage artwork collections, pricing, customer leads, media uploads, and studio content with automated Git-backed persistence.
+Welcome to the **Anugruja Arts Studio Autonomous Admin Console**. This application is an independent, private repository (`abhay2008/AnugrujaArtsStudio-Admin`) designed specifically for studio owners, curators, and administrators to manage artwork collections, pricing, media uploads, and studio content with automated Git-backed persistence.
 
 ---
 
@@ -45,7 +45,7 @@ This portal is fully optimized for GitHub's modern **Fine-Grained Personal Acces
 ## 🛠️ Management Modules
 
 ### 1. Dashboard Overview (`/`)
-- Live counters across all 8 collections, artworks available for sale, and active inquiry leads.
+- Live counters across all 8 collections and artworks available for sale.
 - GitHub connection and commit status badge.
 - Quick navigation shortcuts into each collection.
 
@@ -62,24 +62,20 @@ This portal is fully optimized for GitHub's modern **Fine-Grained Personal Acces
 ### 3. Mass Upload Studio (`/upload`)
 - Multi-file drag and drop from desktop or mobile device.
 - **Client-Side Canvas Compression**: Automatically resizes multi-megapixel photos to optimal web dimensions (max 1600px) and converts to compressed WebP/JPEG, reducing file sizes by up to 90% without visible quality loss.
-- **Batch Metadata Configuration**: Pre-assign destination collection, default medium, and default price before uploading.
-- **Staging Queue**: Review converted thumbnails, fine-tune individual titles, and click **"Stage All for Commit"**.
+- **Smart Collection Mapping**: Filename hints suggest the correct collection, while every upload keeps a clear manual dropdown override.
+- **Safe Metadata Review**: Edit title, category, description, medium, dimensions, price, and optional availability status per image. Non-sale collections never receive price or status fields.
+- **Staging Queue**: Review converted thumbnails and all metadata before clicking **"Stage All for Commit"**. Nothing is published until the global Review & Commit flow is confirmed.
 
-### 4. Studio Profile & Content Editor (`/content`)
+### 4. Events & Workshops (`/events`)
+- Manage upcoming and past workshops, masterclasses, retreats, exhibitions, and outreach events.
+- Edit the title, type, date, venue, description, registration deadline, seats, registration URL, outcome, and event photos.
+- Publishing an event updates the public registration card and the chatbot's live context through the same `content/site.json` CMS.
+
+### 5. Studio Profile & Content Editor (`/content`)
 - **Studio Identity**: Update studio name, tagline, founder biography, and milestone statistics (years of experience, students trained, artworks created, awards won).
 - **Contact & WhatsApp**: Update phone number, WhatsApp business number (with real-time test link), email address, and physical gallery address.
 - **Social Profiles**: Links for Instagram, YouTube, and Facebook.
 - **SEO**: Meta browser titles and search engine descriptions.
-
-### 5. Inquiries & Client Lead Tracker (`/inquiries`)
-- **Lead Inbox**: Tracks client requests for custom paintings, art purchases, academy courses, and workshops.
-- **One-Click WhatsApp Reply**: Generates pre-formatted WhatsApp chat links tailored to the specific artwork and inquiry.
-- **Status Pipeline**: Progress leads through `New` &gt; `In Discussion` &gt; `Quoted` &gt; `Completed`.
-- **Artwork Commission Pricing Calculator**:
-  - Enter canvas dimensions (width x height inches).
-  - Select artistic medium (Watercolor, Acrylic, Oil, Charcoal) with built-in per-square-inch rates.
-  - Choose framing style (Unframed, Teakwood, Gold-Leaf).
-  - Instant price estimation with a **"Copy Client Message"** button.
 
 ### 6. Review Changes Modal & Git Deployment
 - When any modifications are made or artworks staged, a glowing **"Review & Commit"** button appears in the header.
@@ -88,6 +84,12 @@ This portal is fully optimized for GitHub's modern **Fine-Grained Personal Acces
   - List of modified content and gallery reorderings.
   - Custom commit message authoring.
 - Clicking **"Publish to GitHub"** pushes all binary assets and `site.json` changes directly to the remote repository.
+
+---
+
+## ✅ Admin Scope
+
+This portal is intentionally a website CMS only. Use it to manage galleries, artwork metadata, uploads, workshops/events, studio profile content, SEO, and GitHub publishing. Customer communications and CRM records are not stored or managed here; visitors are directed to the studio's configured contact channels instead.
 
 ---
 

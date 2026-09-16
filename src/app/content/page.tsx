@@ -65,10 +65,10 @@ export default function ContentSettingsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="font-cinzel text-2xl font-bold text-studio-gold">
-            Studio Content & Profile Editor
+            Studio Details
           </h1>
         <p className="text-xs text-[color:var(--ink-muted)]">
-          Configure studio biography, contact channels, WhatsApp quick link, and SEO
+          Update the information visitors see about your studio, artist, contact details, and Google search listing
         </p>
         </div>
       </div>
@@ -85,7 +85,7 @@ export default function ContentSettingsPage() {
           <div className="flex items-center gap-2 border-b border-[color:var(--hairline)] pb-3">
             <FileText className="w-4 h-4 text-studio-gold" />
             <h2 className="font-cinzel font-bold text-sm text-studio-gold uppercase tracking-wider">
-              Studio Identity & Founder
+              Studio & Artist Information
             </h2>
           </div>
 
@@ -117,7 +117,7 @@ export default function ContentSettingsPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="admin-label">Founder & Master Artist Name</label>
+              <label className="admin-label">              Artist / Founder Name</label>
               <input
                 type="text"
                 value={brand?.founder || ''}
@@ -143,7 +143,7 @@ export default function ContentSettingsPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="admin-label">Artist Subheading / Philosophy</label>
+              <label className="admin-label">              Artist Introduction</label>
               <textarea
                 rows={3}
                 value={sections?.aboutArtist?.subheading || ''}
@@ -162,7 +162,7 @@ export default function ContentSettingsPage() {
           <div className="flex items-center gap-2 border-b border-[color:var(--hairline)] pb-3">
             <Phone className="w-4 h-4 text-studio-gold" />
             <h2 className="font-cinzel font-bold text-sm text-studio-gold uppercase tracking-wider">
-              Contact & Inquiry Channels
+              Contact Channels
             </h2>
           </div>
 
@@ -234,20 +234,20 @@ export default function ContentSettingsPage() {
           </div>
 
           {/* SEO Metadata */}
-            <div className="pt-2 border-t border-[color:var(--hairline)] space-y-2">              <h3 className="font-semibold text-studio-gold text-xs">Search Engine Optimization (SEO)</h3>
+            <div className="pt-2 border-t border-[color:var(--hairline)] space-y-2">              <h3 className="font-semibold text-studio-gold text-xs">Google Search Preview</h3>
             <div className="space-y-2">
               <input
                 type="text"
                 value={meta?.title || ''}
                 onChange={(e) => updateMeta({ title: e.target.value })}
-                placeholder="Browser Page Title"
+                placeholder="Title shown in Google search results"
                 className="w-full px-3 py-1.5 bg-studio-dark border border-studio-border rounded-xl text-zinc-100 focus:border-studio-gold focus:outline-none"
               />
               <textarea
                 rows={2}
                 value={meta?.description || ''}
                 onChange={(e) => updateMeta({ description: e.target.value })}
-                placeholder="Google Meta Description"
+                placeholder="Short description shown in Google search results"
                 className="admin-input resize-none"
               />
             </div>

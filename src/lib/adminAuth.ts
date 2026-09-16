@@ -2,10 +2,11 @@ export const COOKIE_NAME = 'anugruja_admin_session';
 export const SESSION_DURATION_SECONDS = 60 * 60 * 24; // 24 hours
 
 function getSecretKey(): string {
-  return (
-    process.env.SESSION_SECRET ||
-    'anugruja_arts_studio_secret_session_key_2026_super_secure'
-  );
+  const secret = process.env.SESSION_SECRET?.trim();
+  if (!secret) {
+    throw new Error('SESSION_SECRET environment variable is not configured.');
+  }
+  return secret;
 }
 
 function getExpectedPassword(): string {

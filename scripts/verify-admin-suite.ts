@@ -1,7 +1,6 @@
 import { checkAdminPassword, createSessionToken, verifySessionToken } from '../src/lib/adminAuth';
-import { loadContent, loadInquiries, saveInquiries } from '../src/lib/serverContent';
+import { loadContent } from '../src/lib/serverContent';
 import { publishRepos, owner, publicRepo } from '../src/lib/github';
-import { Inquiry } from '../src/lib/types';
 
 async function runTests() {
   console.log('🧪 Starting Anugruja Arts Studio Admin Suite Verification...\n');
@@ -20,8 +19,8 @@ async function runTests() {
   const token = await createSessionToken('admin-user');
   console.log(`[AUTH] Generated HMAC session token (len=${token.length})`);
   const tokenValid = await verifySessionToken(token);
-  console.log(`[AUTH] Valid token verification: ${tokenValid ? 'PASS' : 'FAIL'}`);
   const bogusTokenValid = await verifySessionToken('bogus:12345:abcd');
+  console.log(`[AUTH] Valid token verification: ${tokenValid ? 'PASS' : 'FAIL'}`);
   console.log(`[AUTH] Bogus token rejection: ${!bogusTokenValid ? 'PASS' : 'FAIL'}`);
 
   if (!validPass || invalidPass || !tokenValid || bogusTokenValid) {
@@ -41,47 +40,18 @@ async function runTests() {
   }
   console.log('[CONTENT] Schema validation: PASS');
 
-  // Test 3: Inquiries Pipeline
-  console.log('\n--- Test 3: Inquiries CRUD Pipeline ---');
-  const initialInquiries = loadInquiries();
-  console.log(`[INQUIRY] Initial inquiries loaded: ${initialInquiries.length}`);
-
-  const testInquiry: Inquiry = {
-    id: `test-inq-${Date.now()}`,
-    customerName: 'Aarav Mehta',
-    phone: '+91 99887 66554',
-    email: 'aarav@artcollector.in',
-    interest: 'Commission',
-    artworkTitle: 'Sunrise on Ganga Ghats',
-    budget: '₹40,000',
-    status: 'New',
-    date: '2026-09-13',
-    notes: 'Large oil painting for living room wall.',
-  };
-
-  const updatedInquiries = [testInquiry, ...initialInquiries];
-  saveInquiries(updatedInquiries);
-  const reloaded = loadInquiries();
-  const found = reloaded.find((i) => i.id === testInquiry.id);
-  console.log(`[INQUIRY] Saved and reloaded new lead: ${found ? 'PASS' : 'FAIL'}`);
-
-  // Cleanup test lead
-  const cleaned = reloaded.filter((i) => i.id !== testInquiry.id);
-  saveInquiries(cleaned);
-  console.log(`[INQUIRY] Cleaned test lead, restored count to ${cleaned.length}: PASS`);
-
-  // Test 4: GitHub Configuration & Multi-Repo Mirroring
-  console.log('\n--- Test 4: GitHub Config & Repo Targets ---');
+  // Test 3: GitHub Configuration & Multi-Repo Mirroring
+  console.log('\n--- Test 3: GitHub Config & Repo Targets ---');
   console.log(`[GITHUB] Owner: ${owner()}`);
   console.log(`[GITHUB] Public Repo Target: ${publicRepo()}`);
   const repos = publishRepos();
   console.log(`[GITHUB] Publish Repos: [${repos.join(', ')}]`);
   if (!repos.includes('AnugrujaArtsStudio')) {
-    throw new Error('Test 4 Failed: AnugrujaArtsStudio missing from repo list');
+    throw new Error('Test 3 Failed: AnugrujaArtsStudio missing from repo list');
   }
   console.log('[GITHUB] Multi-repo target validation: PASS');
 
-  console.log('\n🎉 ALL 4 VERIFICATION SUITES PASSED SUCCESSFULLY!');
+  console.log('\n🎉 ALL 3 VERIFICATION SUITES PASSED SUCCESSFULLY!');
 }
 
 runTests().catch((err) => {

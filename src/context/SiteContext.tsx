@@ -8,9 +8,10 @@ import {
   SiteBrand,
   SiteMeta,
   SiteSections,
-  Inquiry,
+  StudioEvents,
   StagedImage,
   SocialLink,
+  galleryCatalogEntry,
 } from '@/lib/types';
 
 interface SiteContextType {
@@ -30,6 +31,7 @@ interface SiteContextType {
   updateMeta: (patch: Partial<SiteMeta>) => void;
   updateSocial: (social: SocialLink[]) => void;
   updateSection: <K extends keyof SiteSections>(sectionKey: K, patch: Partial<SiteSections[K]>) => void;
+  updateEvents: (patch: Partial<StudioEvents>) => void;
   addArtwork: (gallery: GalleryKey, artwork: Artwork) => void;
   updateArtwork: (gallery: GalleryKey, id: string, patch: Partial<Artwork>) => void;
   deleteArtwork: (gallery: GalleryKey, id: string) => void;
@@ -43,11 +45,6 @@ interface SiteContextType {
   hasUnsavedChanges: boolean;
   commitAllChanges: (message: string) => Promise<{ success: boolean; error?: string }>;
   refreshContent: () => Promise<void>;
-  inquiries: Inquiry[];
-  inquiriesLoading: boolean;
-  saveInquiry: (inquiry: Inquiry) => Promise<void>;
-  deleteInquiry: (id: string) => Promise<void>;
-  refreshInquiries: () => Promise<void>;
 }
 
 const SiteContext = createContext<SiteContextType | null>(null);
@@ -62,8 +59,6 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
   const [tokenOverride, setTokenOverrideState] = useState<string>('');
   const [stagedImages, setStagedImages] = useState<StagedImage[]>([]);
 
-  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
-  const [inquiriesLoading, setInquiriesLoading] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -104,25 +99,9 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
     }
   }, [tokenOverride]);
 
-  const refreshInquiries = useCallback(async () => {
-    setInquiriesLoading(true);
-    try {
-      const res = await fetch('/api/inquiries');
-      if (res.ok) {
-        const data = await res.json();
-        setInquiries(data);
-      }
-    } catch (err) {
-      console.error('Failed to load inquiries:', err);
-    } finally {
-      setInquiriesLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
     refreshContent();
-    refreshInquiries();
-  }, [refreshContent, refreshInquiries]);
+  }, [refreshContent]);
 
   const updateBrand = (patch: Partial<SiteBrand>) => {
     setContent((prev) => {
@@ -174,6 +153,20 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
             ...prev.sections[sectionKey],
             ...patch,
           },
+        },
+      };
+    });
+  };
+
+  const updateEvents = (patch: Partial<StudioEvents>) => {
+    setContent((prev) => {
+      if (!prev) return prev;
+      const current: StudioEvents = prev.events || { upcoming: [], past: [] };
+      return {
+        ...prev,
+        events: {
+          ...current,
+          ...patch,
         },
       };
     });
@@ -370,14 +363,20 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
         }
 
         const uploaded = await uploadRes.json();
+        const destEntry = galleryCatalogEntry(img.targetGallery);
+        const isSale = destEntry.sellable;
         const newArtwork: Artwork = {
           id: `art-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
           title: img.title || 'Untitled Artwork',
-          category: img.category || 'Painting',
-          price: img.price || '₹12,000',
-          medium: img.medium || 'Watercolor on Arches',
-          dimensions: img.dimensions || '18x24 in',
-          status: 'available',
+          category: img.category || destEntry.defaultCategory,
+          description: img.description || undefined,
+          // Never fabricate values: empty stays empty. Price/status only
+          // exist on sellable collections, and only when provided.
+          price: isSale && img.price ? img.price : undefined,
+          medium: img.medium || undefined,
+          dimensions: img.dimensions || undefined,
+          status: isSale && img.status ? img.status : undefined,
+          dateAdded: new Date().toISOString(),
           src: uploaded.src,
         };
 
@@ -414,26 +413,6 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const saveInquiry = async (inquiry: Inquiry) => {
-    const res = await fetch('/api/inquiries', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ inquiry }),
-    });
-    if (res.ok) {
-      await refreshInquiries();
-    }
-  };
-
-  const deleteInquiry = async (id: string) => {
-    const res = await fetch(`/api/inquiries?id=${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-    });
-    if (res.ok) {
-      await refreshInquiries();
-    }
-  };
-
   return (
     <SiteContext.Provider
       value={{
@@ -453,6 +432,7 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
         updateMeta,
         updateSocial,
         updateSection,
+        updateEvents,
         addArtwork,
         updateArtwork,
         deleteArtwork,
@@ -462,11 +442,6 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
         hasUnsavedChanges: dirtyCount > 0,
         commitAllChanges,
         refreshContent,
-        inquiries,
-        inquiriesLoading,
-        saveInquiry,
-        deleteInquiry,
-        refreshInquiries,
       }}
     >
       {children}

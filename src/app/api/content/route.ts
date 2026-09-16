@@ -21,8 +21,15 @@ export async function POST(req: NextRequest) {
       tokenOverride?: string;
     };
 
-    if (!content || !content.galleries) {
-      return NextResponse.json({ error: 'Malformed site content payload' }, { status: 400 });
+    if (!content || !content.galleries || typeof content.galleries !== 'object') {
+      return NextResponse.json({ error: 'Malformed website content' }, { status: 400 });
+    }
+    const galleryLists = Object.values(content.galleries as Record<string, unknown>);
+    if (galleryLists.some((list) => !Array.isArray(list))) {
+      return NextResponse.json({ error: 'Each website collection must be a list of items' }, { status: 400 });
+    }
+    if (content.events && (!Array.isArray(content.events.upcoming) || !Array.isArray(content.events.past))) {
+      return NextResponse.json({ error: 'Event information is not in a valid format' }, { status: 400 });
     }
 
     const tokenHeader = req.headers.get('x-github-token') || undefined;

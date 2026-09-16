@@ -21,10 +21,16 @@ export async function POST(req: NextRequest) {
     }
 
     const buffer = Buffer.from(base64Data, 'base64');
-    const relPath = path.join('images', fileName);
+    if (buffer.length === 0 || buffer.length > 12 * 1024 * 1024) {
+      return NextResponse.json({ error: 'Image payload must be between 1 byte and 12 MB' }, { status: 400 });
+    }
+    const safeFileName = path.basename(fileName).replace(/[^a-zA-Z0-9._-]/g, '-');
+    if (!safeFileName || safeFileName === '.' || safeFileName === '..') {
+      return NextResponse.json({ error: 'Invalid image filename' }, { status: 400 });
+    }
 
     // 1. Save to local admin public/images/ (best-effort — read-only on serverless)
-    const localTarget = path.join(process.cwd(), 'public', 'images', fileName);
+    const localTarget = path.join(process.cwd(), 'public', 'images', safeFileName);
     let localSaved = false;
     try {
       const localDir = path.dirname(localTarget);
@@ -44,7 +50,7 @@ export async function POST(req: NextRequest) {
           'AnugrujaArtsStudio',
           'public',
           'images',
-          fileName
+          safeFileName
         );
         const siblingDir = path.dirname(siblingTarget);
         if (fs.existsSync(siblingDir)) {
@@ -61,22 +67,26 @@ export async function POST(req: NextRequest) {
 
     if (githubConfigured(activeToken)) {
       try {
-        const commitMsg = message || `Admin upload: added artwork asset public/images/${fileName}`;
+        const commitMsg = message || `Admin upload: added artwork asset public/images/${safeFileName}`;
         commitResult = await commitBinaryFile(
-          `public/images/${fileName}`,
+          `public/images/${safeFileName}`,
           buffer,
           commitMsg,
           activeToken
         );
       } catch (commitErr: any) {
-        console.warn('GitHub image commit failed:', commitErr.message);
+        console.warn('Website image publish failed:', commitErr.message);
+        return NextResponse.json(
+          { error: 'The photo could not be published. Nothing was added to the website; please try again.' },
+          { status: 502 }
+        );
       }
     }
 
     return NextResponse.json({
       success: true,
-      src: `/images/${fileName}`,
-      fileName,
+      src: `/images/${safeFileName}`,
+      fileName: safeFileName,
       sizeBytes: buffer.length,
       localSaved,
       commitResult,

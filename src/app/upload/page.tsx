@@ -3,18 +3,13 @@
 import React, { useState, useRef } from 'react';
 import {
   UploadCloud,
-  Images,
   Sparkles,
   CheckCircle,
-  X,
   Loader2,
   Trash2,
-  ArrowRight,
-  ShieldCheck,
 } from 'lucide-react';
 import { useSite } from '@/context/SiteContext';
-import { GALLERIES_META } from '@/data/galleriesData';
-import { GalleryKey, StagedImage } from '@/lib/types';
+import { GALLERY_CATALOG, ArtworkStatus, GalleryKey, StagedImage, galleryCatalogEntry, suggestGalleryFromFilename } from '@/lib/types';
 import { optimizeArtworkImage } from '@/lib/imageOptimize';
 
 interface LocalStagingItem {
@@ -23,23 +18,24 @@ interface LocalStagingItem {
   previewUrl: string;
   base64Data: string;
   targetGallery: GalleryKey;
+  gallerySource: 'filename' | 'default' | 'manual';
   title: string;
   category: string;
+  categoryTouched: boolean;
+  description: string;
   price: string;
   medium: string;
   dimensions: string;
+  status?: ArtworkStatus;
   originalBytes: number;
   optimizedBytes: number;
 }
 
 export default function MassUploadPage() {
-  const { stageUploadedImage, setActiveGallery } = useSite();
+  const { stageUploadedImage } = useSite();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [targetGallery, setTargetGallery] = useState<GalleryKey>('sale');
-  const [defaultMedium, setDefaultMedium] = useState('Watercolor on Archival Paper');
-  const [defaultPrice, setDefaultPrice] = useState('₹18,000');
-  const [defaultCategory, setDefaultCategory] = useState('Painting');
 
   const [processing, setProcessing] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -65,17 +61,27 @@ export default function MassUploadPage() {
           .replace(/[_-]+/g, ' ')
           .replace(/\b\w/g, (c) => c.toUpperCase());
 
+        // Smart mapping: filename hints beat the batch default.
+        const suggested = suggestGalleryFromFilename(file.name);
+        const dest = suggested ?? targetGallery;
+        const destDef = galleryCatalogEntry(dest);
+
         newItems.push({
           id: `upload-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
           name: optimized.fileName,
           previewUrl: optimized.dataUrl,
           base64Data: optimized.base64Payload,
-          targetGallery,
+          targetGallery: dest,
+          gallerySource: suggested ? 'filename' : 'default',
           title: cleanName,
-          category: defaultCategory,
-          price: defaultPrice,
-          medium: defaultMedium,
-          dimensions: '20x28 in',
+          category: destDef.defaultCategory,
+          categoryTouched: false,
+          description: '',
+          // Never fabricate: fields stay empty unless the client fills them.
+          price: '',
+          medium: '',
+          dimensions: '',
+          status: undefined,
           originalBytes: optimized.originalBytes,
           optimizedBytes: optimized.optimizedBytes,
         });
@@ -104,6 +110,24 @@ export default function MassUploadPage() {
     );
   };
 
+  const setItemGallery = (id: string, gallery: GalleryKey) => {
+    const def = galleryCatalogEntry(gallery);
+    setStagedQueue((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              targetGallery: gallery,
+              gallerySource: 'manual',
+              category: item.categoryTouched ? item.category : def.defaultCategory,
+              price: def.sellable ? item.price : '',
+              status: def.sellable ? item.status : undefined,
+            }
+          : item
+      )
+    );
+  };
+
   const handleStageAll = () => {
     if (stagedQueue.length === 0) return;
 
@@ -116,16 +140,18 @@ export default function MassUploadPage() {
         targetGallery: item.targetGallery,
         title: item.title,
         category: item.category,
+        description: item.description,
         price: item.price,
         medium: item.medium,
         dimensions: item.dimensions,
+        status: item.status,
         sizeBytes: item.optimizedBytes,
       });
     });
 
     const count = stagedQueue.length;
     setStagedQueue([]);
-    setSuccessToast(`Staged ${count} artwork photo${count === 1 ? '' : 's'} for deployment!`);
+    setSuccessToast(`${count} photo${count === 1 ? '' : 's'} added to your publish review.`);
     setTimeout(() => setSuccessToast(''), 4000);
   };
 
@@ -133,10 +159,10 @@ export default function MassUploadPage() {
     <div className="space-y-6">
       <div>
         <h1 className="font-cinzel text-2xl font-bold text-studio-gold">
-          Mass Upload Studio
+          Add New Work
         </h1>
         <p className="text-xs text-[color:var(--ink-muted)]">
-          Drop artwork photos for automatic canvas compression, tagging, and one-click GitHub push
+          Add paintings and studio photos. We will help place each one in the right part of your website before you publish.
         </p>
       </div>
 
@@ -150,57 +176,27 @@ export default function MassUploadPage() {
       {/* Batch Defaults Controls */}
       <div className="admin-panel p-5 space-y-4">
         <h2 className="text-xs font-bold font-cinzel text-studio-gold uppercase tracking-wider">
-          Batch Target & Defaults
+          Where should unmatched photos go?
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
           {/* Destination Collection */}
           <div className="space-y-1">
-            <label className="admin-label">Destination Gallery</label>
+            <label className="admin-label">Choose a collection</label>
             <select
               value={targetGallery}
               onChange={(e) => setTargetGallery(e.target.value as GalleryKey)}
               className="admin-input text-studio-gold font-semibold"
             >
-              {GALLERIES_META.map((meta) => (
+              {GALLERY_CATALOG.map((meta) => (
                 <option key={meta.key} value={meta.key}>
-                  {meta.label}
+                  {meta.label} — {meta.sellable ? 'can be offered for sale' : 'website showcase'}
                 </option>
               ))}
             </select>
-          </div>
-
-          {/* Default Medium */}
-          <div className="space-y-1">
-            <label className="admin-label">Default Medium</label>
-            <input
-              type="text"
-              value={defaultMedium}
-              onChange={(e) => setDefaultMedium(e.target.value)}
-              className="admin-input text-studio-gold font-semibold"
-            />
-          </div>
-
-          {/* Default Price */}
-          <div className="space-y-1">
-            <label className="admin-label">Default Price</label>
-            <input
-              type="text"
-              value={defaultPrice}
-              onChange={(e) => setDefaultPrice(e.target.value)}
-              className="w-full px-3 py-2 bg-studio-dark border border-studio-border rounded-xl text-amber-300 font-semibold focus:border-studio-gold focus:outline-none"
-            />
-          </div>
-
-          {/* Default Category */}
-          <div className="space-y-1">
-            <label className="admin-label">Category</label>
-            <input
-              type="text"
-              value={defaultCategory}
-              onChange={(e) => setDefaultCategory(e.target.value)}
-              className="admin-input text-studio-gold font-semibold"
-            />
+            <p className="text-[11px] text-[color:var(--ink-faint)]">
+              {galleryCatalogEntry(targetGallery).purpose}
+            </p>
           </div>
         </div>
       </div>
@@ -239,10 +235,10 @@ export default function MassUploadPage() {
           </div>
           <div>
             <h3 className="font-cinzel text-lg font-bold text-white">
-              {processing ? 'Optimizing Artwork Canvas...' : 'Select or Drop Paintings Here'}
+              {processing ? 'Preparing your photos...' : 'Choose or drop photos here'}
             </h3>
             <p className="text-xs text-[color:var(--ink-muted)] mt-1">
-              Supports high-resolution JPEG, PNG, WEBP files. Browser compresses and resizes photos seamlessly for fast web loading.
+              You can select several photos at once. Photos are prepared automatically so the website stays fast and clear.
             </p>
           </div>
         </div>
@@ -253,14 +249,14 @@ export default function MassUploadPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-cinzel text-base font-bold text-studio-gold">
-              Ready for Staging ({stagedQueue.length} photo{stagedQueue.length === 1 ? '' : 's'})
+              Ready for Review ({stagedQueue.length} photo{stagedQueue.length === 1 ? '' : 's'})
             </h2>
             <button
               onClick={handleStageAll}
               className="admin-btn-gold px-5 py-2"
             >
               <Sparkles className="w-4 h-4" />
-              <span>Stage All for Commit</span>
+              <span>Review These Photos</span>
             </button>
           </div>
 
@@ -290,30 +286,80 @@ export default function MassUploadPage() {
                         placeholder="Artwork title"
                         className="admin-input text-white font-medium"
                       />
-                      <div className="grid grid-cols-2 gap-2">
+                      <select
+                        value={item.targetGallery}
+                        onChange={(e) => setItemGallery(item.id, e.target.value as GalleryKey)}
+                        className="admin-input text-[11px]"
+                      >
+                        {GALLERY_CATALOG.map((meta) => (
+                          <option key={meta.key} value={meta.key}>
+                            {meta.label} — {meta.sellable ? 'sale catalog' : 'showcase only'}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="text-[10px] text-[color:var(--ink-faint)] leading-snug">
+                        {item.gallerySource === 'filename' && (
+                          <span className="text-emerald-400">✓ Suggested from the file name — </span>
+                        )}
+                        {galleryCatalogEntry(item.targetGallery).purpose}
+                      </p>
+                      <input
+                        type="text"
+                        value={item.category}
+                        onChange={(e) => updateItem(item.id, { category: e.target.value, categoryTouched: true })}
+                        placeholder={galleryCatalogEntry(item.targetGallery).defaultCategory}
+                        className="admin-input"
+                      />
+                      <textarea
+                        rows={2}
+                        value={item.description}
+                        onChange={(e) => updateItem(item.id, { description: e.target.value })}
+                        placeholder="Short description for the public website (optional)"
+                        className="admin-input resize-y"
+                      />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <input
                           type="text"
-                          value={item.price}
-                          onChange={(e) => updateItem(item.id, { price: e.target.value })}
-                          placeholder="Price"
-                          className="admin-input text-studio-gold font-semibold"
+                          value={item.medium}
+                          onChange={(e) => updateItem(item.id, { medium: e.target.value })}
+                          placeholder="Medium (optional)"
+                          className="admin-input"
                         />
-                        <select
-                          value={item.targetGallery}
-                          onChange={(e) =>
-                            updateItem(item.id, { targetGallery: e.target.value as GalleryKey })
-                          }
-                          className="admin-input text-[11px]"
-                        >
-                          {GALLERIES_META.map((meta) => (
-                            <option key={meta.key} value={meta.key}>
-                              {meta.label}
-                            </option>
-                          ))}
-                        </select>
+                        <input
+                          type="text"
+                          value={item.dimensions}
+                          onChange={(e) => updateItem(item.id, { dimensions: e.target.value })}
+                          placeholder="Dimensions (optional)"
+                          className="admin-input"
+                        />
                       </div>
+                      {galleryCatalogEntry(item.targetGallery).sellable ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <input
+                            type="text"
+                            value={item.price}
+                            onChange={(e) => updateItem(item.id, { price: e.target.value })}
+                            placeholder="Price — blank = on request"
+                            className="admin-input text-studio-gold font-semibold"
+                          />
+                          <select
+                            value={item.status || ''}
+                            onChange={(e) => updateItem(item.id, { status: (e.target.value || undefined) as ArtworkStatus | undefined })}
+                            className="admin-input"
+                          >
+                            <option value="">No availability label</option>
+                            <option value="Available">Available</option>
+                            <option value="Reserved">Reserved</option>
+                            <option value="Sold">Sold</option>
+                          </select>
+                        </div>
+                      ) : (
+                        <p className="text-[10px] text-[color:var(--ink-faint)] italic">
+                          Showcase piece — price and availability labels are intentionally disabled.
+                        </p>
+                      )}
                       <p className="text-[11px] text-[color:var(--ink-muted)]">
-                        Compressed: {Math.round(item.optimizedBytes / 1024)} KB{' '}
+                        Prepared photo: {Math.round(item.optimizedBytes / 1024)} KB{' '}
                         {savings > 0 && <span className="text-emerald-400">(-{savings}%)</span>}
                       </p>
                     </div>
