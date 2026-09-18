@@ -30,7 +30,7 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
     removeStagedImage,
   } = useSite();
 
-  const [commitStatus, setCommitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [commitStatus, setCommitStatus] = useState<'idle' | 'success' | 'local-only' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
   if (!isOpen) return null;
@@ -38,17 +38,22 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
   const handleCommit = async () => {
     setCommitStatus('idle');
     setErrorMessage('');
-    const res = await commitAllChanges('Website update from Studio Manager');
-    if (res.success) {
-      setCommitStatus('success');
-      setTimeout(() => {
-        onClose();
-        setCommitStatus('idle');
-      }, 1600);
-    } else {
+    const res = await commitAllChanges('Website update from the admin portal');
+    if (!res.success) {
       setCommitStatus('error');
       setErrorMessage(res.error || 'The website could not be updated. Your changes are still safe to try again.');
+      return;
     }
+    if (res.published === false) {
+      // Saved to disk only — stay open so the operator actually reads this.
+      setCommitStatus('local-only');
+      return;
+    }
+    setCommitStatus('success');
+    setTimeout(() => {
+      onClose();
+      setCommitStatus('idle');
+    }, 1600);
   };
 
   return (
@@ -151,6 +156,18 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
             <div className="flex items-center gap-2 p-3 bg-rose-950/40 border border-rose-500/40 text-rose-300 rounded-xl text-xs">
               <AlertCircle className="w-4 h-4 flex-none" />
               <span>{errorMessage}</span>
+            </div>
+          )}
+
+          {/* Saved locally, but the live website was not updated */}
+          {commitStatus === 'local-only' && (
+            <div className="flex items-start gap-2 p-3 bg-amber-950/40 border border-amber-500/40 text-amber-200 rounded-xl text-xs">
+              <AlertCircle className="w-4 h-4 flex-none mt-0.5" />
+              <span>
+                Saved on this computer only — the public website was <strong>not</strong> updated, because this
+                copy of the admin portal has no GitHub access. Publish from the hosted admin portal, or add{' '}
+                <code>GITHUB_TOKEN</code> to this environment and publish again.
+              </span>
             </div>
           )}
 

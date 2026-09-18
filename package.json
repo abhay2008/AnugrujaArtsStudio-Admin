@@ -11,7 +11,9 @@
     "build": "next build",
     "start": "next start -p 3002",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "verify": "node --import ./scripts/ts-node-boot.mjs --no-warnings scripts/verify-admin-suite.ts",
+    "sync:content": "node scripts/sync-content.mjs"
   },
   "dependencies": {
     "next": "15.5.25",

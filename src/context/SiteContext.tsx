@@ -14,6 +14,16 @@ import {
   galleryCatalogEntry,
 } from '@/lib/types';
 
+/**
+ * CMS domains the "Review & Publish" counter watches, whole-object.
+ *
+ * `events` and `chatbot` belong here as much as `brand` does: when they were
+ * missing from this list, editing a workshop left `dirtyCount` at zero, the
+ * publish button stayed disabled, and the edit could never reach the website
+ * — even though the Events screen looked like it had saved.
+ */
+const COUNTED_DOMAINS = ['brand', 'meta', 'social', 'sections', 'events', 'chatbot'] as const;
+
 interface SiteContextType {
   content: SiteContent | null;
   loading: boolean;
@@ -43,7 +53,16 @@ interface SiteContextType {
   ) => void;
   dirtyCount: number;
   hasUnsavedChanges: boolean;
-  commitAllChanges: (message: string) => Promise<{ success: boolean; error?: string }>;
+  commitAllChanges: (message: string) => Promise<{
+    success: boolean;
+    error?: string;
+    /**
+     * False when the save landed on this machine only (no GitHub access), so
+     * the public website was NOT updated. The caller must say so — silently
+     * reporting success is what made "my changes don't appear" untraceable.
+     */
+    published?: boolean;
+  }>;
   refreshContent: () => Promise<void>;
 }
 
@@ -288,21 +307,11 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
     if (!content || !initialContent) return stagedImages.length;
     let count = stagedImages.length;
 
-    // Brand diff
-    if (JSON.stringify(content.brand) !== JSON.stringify(initialContent.brand)) {
-      count += 1;
-    }
-    // Meta diff
-    if (JSON.stringify(content.meta) !== JSON.stringify(initialContent.meta)) {
-      count += 1;
-    }
-    // Social diff
-    if (JSON.stringify(content.social) !== JSON.stringify(initialContent.social)) {
-      count += 1;
-    }
-    // Sections diff
-    if (JSON.stringify(content.sections) !== JSON.stringify(initialContent.sections)) {
-      count += 1;
+    // Every simple CMS domain, compared as a whole.
+    for (const domain of COUNTED_DOMAINS) {
+      if (JSON.stringify(content[domain] ?? null) !== JSON.stringify(initialContent[domain] ?? null)) {
+        count += 1;
+      }
     }
 
     // Galleries diff
@@ -402,10 +411,12 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
         throw new Error(errData.error || 'Failed to commit site changes');
       }
 
+      const saveData = await saveRes.json().catch(() => ({}) as { published?: boolean });
+
       setContent(workingContent);
       setInitialContent(JSON.parse(JSON.stringify(workingContent)));
       clearStagedImages();
-      return { success: true };
+      return { success: true, published: saveData.published !== false };
     } catch (err: any) {
       return { success: false, error: err.message || 'Commit transaction failed' };
     } finally {

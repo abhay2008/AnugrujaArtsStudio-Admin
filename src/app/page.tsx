@@ -77,7 +77,7 @@ export default function DashboardPage() {
           <div className="space-y-2.5">
             <span className="admin-pill admin-pill--gold">
               <Sparkles className="w-3 h-3" />
-              Studio Manager
+              Admin Portal
             </span>
             <h1 className="font-cinzel text-2xl sm:text-3xl font-bold text-white tracking-wide">
               {content.brand?.name || 'Anugruja Arts Studio'}

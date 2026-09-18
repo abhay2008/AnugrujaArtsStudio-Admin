@@ -67,7 +67,7 @@ export default function LoginClient() {
               ANUGRUJA
             </h1>
             <p className="text-[10px] text-amber-200/60 tracking-[0.34em] uppercase font-sans mt-1.5">
-              Studio Manager
+              Admin Portal
             </p>
           </div>
         </div>
@@ -117,7 +117,7 @@ Studio Password
               </>
             ) : (
               <>
-                <span>Open Studio Manager</span>
+                <span>Open Admin Portal</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}

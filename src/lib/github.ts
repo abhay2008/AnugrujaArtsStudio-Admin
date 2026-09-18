@@ -1,4 +1,8 @@
-import { GitHubCommitResult } from './types';
+// `import type`: a type-only import must be marked as such or Node's built-in
+// TypeScript stripping leaves a runtime import of a name that does not exist —
+// which is what stopped `scripts/verify-admin-suite.ts` from running on plain
+// Node (see npm run verify).
+import type { GitHubCommitResult } from './types';
 
 const GITHUB_API = 'https://api.github.com';
 

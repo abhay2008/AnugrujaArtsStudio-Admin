@@ -32,3 +32,6 @@ yarn-error.log*
 next-env.d.ts
 .vercel
 .env*
+
+# Local preview/dev logs (never commit)
+.freebuff*.log

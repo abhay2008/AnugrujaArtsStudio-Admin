@@ -13,6 +13,25 @@ import {
 import { useSite } from '@/context/SiteContext';
 import type { StudioEvent } from '@/lib/types';
 
+/**
+ * Suggested event labels. These are only suggestions: the website renders
+ * whatever `eventType` it finds, and the studio's own events use labels such as
+ * "Weekend Masterclass". A dropdown that silently showed "Workshop" for a value
+ * it did not contain made the portal disagree with the live site — and rewrote
+ * the label the moment it was touched — so the form keeps the current value and
+ * offers it as an option instead.
+ */
+const EVENT_TYPE_PRESETS = [
+  'Workshop',
+  'Weekend Masterclass',
+  'Masterclass',
+  'Exhibition',
+  'Retreat',
+  'Class',
+  'Outreach',
+  'Corporate',
+];
+
 const EMPTY_EVENT: StudioEvent = {
   id: '',
   title: '',
@@ -49,6 +68,9 @@ function EventForm({
   onCancel: () => void;
 }) {
   const imagesText = (value.images || []).join('\n');
+  const currentType = (value.eventType || '').trim();
+  const isCustomType = Boolean(currentType) && !EVENT_TYPE_PRESETS.includes(currentType);
+  const typeOptions = isCustomType ? [currentType, ...EVENT_TYPE_PRESETS] : EVENT_TYPE_PRESETS;
 
   return (
     <div className="admin-panel p-5 sm:p-6 space-y-5">
@@ -72,14 +94,15 @@ function EventForm({
         <label className="space-y-1">
           <span className="admin-label">Event type</span>
           <select value={value.eventType || 'Workshop'} onChange={(e) => onChange({ eventType: e.target.value })} className="admin-input">
-            <option>Workshop</option>
-            <option>Masterclass</option>
-            <option>Exhibition</option>
-            <option>Retreat</option>
-            <option>Class</option>
-            <option>Outreach</option>
-            <option>Corporate</option>
+            {typeOptions.map((type) => (
+              <option key={type} value={type}>{type}</option>
+            ))}
           </select>
+          {isCustomType && (
+            <span className="block text-[11px] text-[color:var(--ink-faint)]">
+              Shown on the website as “{currentType}” — kept exactly as-is unless you change it.
+            </span>
+          )}
         </label>
         <label className="space-y-1">
           <span className="admin-label">Display date *</span>
