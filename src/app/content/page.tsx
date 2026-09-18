@@ -200,7 +200,7 @@ export default function ContentSettingsPage() {
                   updateBrand({ whatsapp: e.target.value });
                   showToast('WhatsApp updated');
                 }}
-                placeholder="https://wa.link/... or +91 96112 55949"
+                placeholder="https://wa.me/919849238464 or +91 98492 38464"
                 className="admin-input"
               />
             </div>
