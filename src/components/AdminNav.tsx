@@ -101,8 +101,10 @@ export default function AdminNav({ onOpenReviewModal }: AdminNavProps) {
             aria-label="Anugruja admin portal — home"
             className="flex shrink-0 items-center gap-2.5 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-[linear-gradient(150deg,#f7e494_0%,#d4af37_55%,#8a6410_100%)] flex items-center justify-center text-[#221204] font-cinzel font-black text-xl shadow-[0_6px_18px_-6px_rgba(212,175,55,0.7),inset_0_1px_0_rgba(255,255,255,0.6)] ring-1 ring-amber-200/40 group-hover:scale-105 transition-transform">
-              A
+            {/* The studio's real logo crest (previously a plain "A" letter). */}
+            <div className="w-10 h-10 rounded-xl bg-[linear-gradient(150deg,#f7e494_0%,#d4af37_55%,#8a6410_100%)] overflow-hidden flex items-center justify-center shadow-[0_6px_18px_-6px_rgba(212,175,55,0.7),inset_0_1px_0_rgba(255,255,255,0.6)] ring-1 ring-amber-200/40 group-hover:scale-105 transition-transform">
+              {/* eslint-disable-next-line @next/next/no-img-element -- static local asset; next/image adds nothing here */}
+              <img src="/images/logo.png" alt="Anugruja Arts Studio logo" className="h-full w-full object-contain p-1" />
             </div>
             <div>
               <span className="block font-cinzel text-[15px] font-bold leading-none tracking-[0.16em] text-studio-gold sm:text-[17px]">

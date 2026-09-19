@@ -195,11 +195,17 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
     setContent((prev) => {
       if (!prev) return prev;
       const list = prev.galleries[gallery] || [];
+      // Price-confirmation rule for hand-created artworks: a price entered
+      // with the artwork is confirmed the moment it is added.
+      const stamped =
+        artwork.price !== undefined && artwork.price !== null && String(artwork.price).trim() !== ''
+          ? { ...artwork, priceConfirmedAt: artwork.priceConfirmedAt ?? new Date().toISOString() }
+          : artwork;
       return {
         ...prev,
         galleries: {
           ...prev.galleries,
-          [gallery]: [artwork, ...list],
+          [gallery]: [stamped, ...list],
         },
       };
     });
@@ -209,7 +215,18 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
     setContent((prev) => {
       if (!prev) return prev;
       const list = prev.galleries[gallery] || [];
-      const updated = list.map((item) => (item.id === id ? { ...item, ...patch } : item));
+      const updated = list.map((item) => {
+        if (item.id !== id) return item;
+        const next = { ...item, ...patch };
+        // Price-confirmation rule: writing a non-empty price stamps the
+        // artwork as price-confirmed so the public site may display it.
+        if (!('priceConfirmedAt' in patch)) {
+          const priceChanged = (item.price ?? '') !== (next.price ?? '');
+          const hasPrice = next.price !== undefined && next.price !== null && String(next.price).trim() !== '';
+          if (priceChanged && hasPrice) next.priceConfirmedAt = new Date().toISOString();
+        }
+        return next;
+      });
       return {
         ...prev,
         galleries: {
@@ -380,8 +397,10 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
           category: img.category || destEntry.defaultCategory,
           description: img.description || undefined,
           // Never fabricate values: empty stays empty. Price/status only
-          // exist on sellable collections, and only when provided.
+          // exist on sellable collections, and only when provided. A price
+          // provided by the admin here is confirmed at publish time.
           price: isSale && img.price ? img.price : undefined,
+          priceConfirmedAt: isSale && img.price ? new Date().toISOString() : undefined,
           medium: img.medium || undefined,
           dimensions: img.dimensions || undefined,
           status: isSale && img.status ? img.status : undefined,

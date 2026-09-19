@@ -17,6 +17,11 @@ export interface Artwork {
   category?: string;
   aspect?: string;
   price?: number | string;
+  /**
+   * ISO timestamp proving an admin explicitly saved this price. Until it is
+   * set, the public website masks the price (XXXX + contact-the-studio note).
+   */
+  priceConfirmedAt?: string;
   description?: string;
   medium?: string;
   dimensions?: string;
