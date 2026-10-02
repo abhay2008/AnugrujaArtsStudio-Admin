@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -53,6 +53,13 @@ export default function AdminNav({ onOpenReviewModal }: AdminNavProps) {
   const { hasUnsavedChanges, dirtyCount } = useSite();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  useEffect(() => setMobileMenuOpen(false), [pathname]);
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') setMobileMenuOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mobileMenuOpen]);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -76,7 +83,7 @@ export default function AdminNav({ onOpenReviewModal }: AdminNavProps) {
   const navItemClass = (isActive: boolean) =>
     [
       'inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border',
-      'min-h-[38px] px-2.5 xl:px-3.5 text-[13px] font-semibold',
+      'min-h-[44px] min-w-[44px] justify-center px-2.5 xl:px-3.5 text-[13px] font-semibold',
       'transition-colors duration-200',
       isActive
         ? 'border-studio-gold/40 bg-studio-gold/12 text-studio-gold shadow-[inset_0_1px_0_rgba(255,251,235,0.08)]'
@@ -99,15 +106,15 @@ export default function AdminNav({ onOpenReviewModal }: AdminNavProps) {
           <Link
             href="/"
             aria-label="Anugruja admin portal — home"
-            className="flex shrink-0 items-center gap-2.5 group"
+            className="flex min-w-0 items-center gap-2 sm:gap-2.5 group"
           >
             {/* The studio's real logo crest (previously a plain "A" letter). */}
-            <div className="w-10 h-10 rounded-xl bg-[linear-gradient(150deg,#f7e494_0%,#d4af37_55%,#8a6410_100%)] overflow-hidden flex items-center justify-center shadow-[0_6px_18px_-6px_rgba(212,175,55,0.7),inset_0_1px_0_rgba(255,255,255,0.6)] ring-1 ring-amber-200/40 group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 shrink-0 rounded-xl bg-[linear-gradient(150deg,#f7e494_0%,#d4af37_55%,#8a6410_100%)] overflow-hidden flex items-center justify-center shadow-[0_6px_18px_-6px_rgba(212,175,55,0.7),inset_0_1px_0_rgba(255,255,255,0.6)] ring-1 ring-amber-200/40 group-hover:scale-105 transition-transform">
               {/* eslint-disable-next-line @next/next/no-img-element -- static local asset; next/image adds nothing here */}
               <img src="/images/logo.png" alt="Anugruja Arts Studio logo" className="h-full w-full object-contain p-1" />
             </div>
-            <div>
-              <span className="block font-cinzel text-[15px] font-bold leading-none tracking-[0.16em] text-studio-gold sm:text-[17px]">
+            <div className="min-w-0">
+              <span className="block truncate font-cinzel text-[13px] font-bold leading-none tracking-[0.16em] text-studio-gold sm:text-[17px]">
                 ANUGRUJA
               </span>
               <span className="mt-[5px] block text-[9px] font-semibold uppercase leading-none tracking-[0.26em] text-amber-200/60 whitespace-nowrap">
@@ -121,7 +128,7 @@ export default function AdminNav({ onOpenReviewModal }: AdminNavProps) {
               stays one clean line at every width with no second-line text. */}
           <nav
             aria-label="Portal sections"
-            className="hidden md:inline-flex shrink-0 items-center gap-0.5 rounded-full border border-white/[0.07] bg-black/25 p-1"
+            className="hidden lg:inline-flex shrink-0 items-center gap-0.5 rounded-full border border-white/[0.07] bg-black/25 p-1"
           >
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
@@ -148,11 +155,13 @@ export default function AdminNav({ onOpenReviewModal }: AdminNavProps) {
               <button
                 onClick={onOpenReviewModal}
                 title="Review and publish your changes to the website"
+                aria-label={`Review and publish ${dirtyCount} pending changes`}
                 className="admin-btn-gold !rounded-full !px-3 sm:!px-4 !py-2 !text-xs whitespace-nowrap"
               >
                 <Sparkles className="h-3.5 w-3.5 shrink-0" aria-hidden />
                 {/* Short label on narrow bars, full wording once there is room. */}
-                <span className="lg:hidden">Publish ({dirtyCount})</span>
+                <span className="hidden sm:inline lg:hidden">Publish ({dirtyCount})</span>
+                <span className="sm:hidden">{dirtyCount}</span>
                 <span className="hidden lg:inline">Review &amp; publish ({dirtyCount})</span>
               </button>
             ) : (
@@ -170,7 +179,7 @@ export default function AdminNav({ onOpenReviewModal }: AdminNavProps) {
                 The wrapper (not the link) carries the breakpoint, because
                 `.admin-btn-ghost` sets its own `display` that would out-rank
                 Tailwind's `hidden`. */}
-            <div className="hidden shrink-0 md:block">
+            <div className="hidden shrink-0 lg:block">
               <a
                 href={SITE_URL}
                 target="_blank"
@@ -191,7 +200,7 @@ export default function AdminNav({ onOpenReviewModal }: AdminNavProps) {
               disabled={loggingOut}
               title="Sign out of the admin portal"
               aria-label="Sign out of the admin portal"
-              className="shrink-0 rounded-full p-2 text-zinc-400 transition-colors hover:bg-rose-950/25 hover:text-rose-300 disabled:opacity-50"
+              className="hidden sm:inline-flex shrink-0 items-center justify-center rounded-full p-2 text-zinc-400 transition-colors hover:bg-rose-950/25 hover:text-rose-300 disabled:opacity-50"
             >
               <LogOut className="h-4 w-4" aria-hidden />
             </button>
@@ -199,7 +208,7 @@ export default function AdminNav({ onOpenReviewModal }: AdminNavProps) {
             {/* Mobile hamburger */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden shrink-0 rounded-lg p-2 text-zinc-300 hover:bg-white/[0.05] hover:text-studio-gold"
+              className="lg:hidden shrink-0 rounded-lg p-2 text-zinc-300 hover:bg-white/[0.05] hover:text-studio-gold"
               aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               aria-expanded={mobileMenuOpen}
             >
@@ -211,7 +220,7 @@ export default function AdminNav({ onOpenReviewModal }: AdminNavProps) {
 
       {/* Mobile drawer — has the room, so it uses the full section names. */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#1a0b24]/95 backdrop-blur-xl border-b border-studio-gold/15 px-4 pt-2 pb-4 space-y-1">
+        <nav aria-label="Mobile portal sections" className="admin-mobile-drawer lg:hidden overflow-y-auto overscroll-contain bg-[#180626] border-b border-studio-gold/15 px-4 pt-2 pb-4 space-y-1">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -243,8 +252,11 @@ export default function AdminNav({ onOpenReviewModal }: AdminNavProps) {
               <ExternalLink className="w-4 h-4 text-studio-gold" aria-hidden />
               <span>View public website</span>
             </a>
+            <button type="button" onClick={handleLogout} disabled={loggingOut} className="flex items-center gap-2 px-3 py-2.5 text-sm text-rose-300 disabled:opacity-50">
+              <LogOut className="w-4 h-4" aria-hidden /> Sign out
+            </button>
           </div>
-        </div>
+        </nav>
       )}
     </header>
   );

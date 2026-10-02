@@ -23,10 +23,10 @@ export default function DeleteArtworkModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in">
-      <div className="admin-panel relative w-full max-w-md overflow-hidden p-6 space-y-5" style={{ borderColor: 'rgba(251, 113, 133, 0.35)' }}>
-        <div className="flex items-start justify-between">
+      <div className="admin-dialog admin-panel relative w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto p-4 sm:p-6 space-y-5" style={{ borderColor: 'rgba(251, 113, 133, 0.35)' }}>
+        <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
+            <div className="hidden sm:block shrink-0 p-2.5 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div>
@@ -36,7 +36,8 @@ export default function DeleteArtworkModal({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-[color:var(--ink-faint)] hover:text-studio-gold rounded-lg transition-colors"
+            aria-label="Close delete confirmation"
+            className="shrink-0 p-1.5 text-[color:var(--ink-faint)] hover:text-studio-gold rounded-lg transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -65,7 +66,7 @@ export default function DeleteArtworkModal({
         </p>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-3 pt-2">
+        <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-3 pt-2">
           <button
             type="button"
             onClick={onClose}

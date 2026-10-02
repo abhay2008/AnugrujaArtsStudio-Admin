@@ -164,7 +164,7 @@ function GalleryManagerContent() {
               <button
                 key={meta.key}
                 onClick={() => setSelectedGallery(meta.key)}
-                className={`flex items-center gap-2 px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-all ${
+                className={`flex shrink-0 items-center gap-2 px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-all ${
                   isSelected ? 'admin-btn-gold' : 'admin-btn-ghost'
                 }`}
               >
@@ -187,7 +187,7 @@ function GalleryManagerContent() {
       {/* Filter and Search Bar */}
       <div className="admin-panel flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3">
         {/* Search */}
-        <div className="relative flex-1">
+        <div className="relative min-w-0 flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
           <input
             type="text"
@@ -199,11 +199,11 @@ function GalleryManagerContent() {
         </div>
 
         {/* Status Filter */}
-        <div className="flex items-center gap-2 flex-none">
+        <div className="flex flex-wrap items-center gap-2 sm:flex-none">
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value as any)}
-            className="admin-input px-3 py-1.5 text-xs w-auto sm:w-auto"
+            className="admin-input min-w-0 px-3 py-1.5 text-xs flex-1 sm:flex-none sm:!w-auto"
           >
             <option value="all">All Statuses</option>
             <option value="Available">Available for Sale</option>
@@ -363,7 +363,7 @@ function GalleryManagerContent() {
                       <p className="text-xs text-studio-gold font-medium line-clamp-1">
                         {art.medium || 'Medium unspecified'}
                       </p>
-                      <div className="flex items-center justify-between text-xs text-zinc-400 pt-1">
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-400 pt-1">
                         <span className="font-semibold text-studio-gold">
                           {art.price || 'Price on Request'}
                         </span>
@@ -373,7 +373,7 @@ function GalleryManagerContent() {
                   )}
 
                   {/* Reordering Controls & Delete */}
-                  <div className="pt-3 border-t border-studio-border/60 flex items-center justify-between gap-1 text-xs">
+                  <div className="pt-3 border-t border-studio-border/60 flex flex-wrap items-center justify-between gap-2 text-xs">
                     {/* Stepper Buttons */}
                     <div className="flex items-center gap-1 text-zinc-400">
                       <button
@@ -423,7 +423,7 @@ function GalleryManagerContent() {
                             }
                           }
                         }}
-                        className="w-12 px-1.5 py-0.5 bg-black/40 border border-[color:var(--hairline)] rounded text-[11px] font-mono text-center text-studio-gold focus:outline-none focus:border-[color:var(--hairline-strong)]"
+                        className="min-h-[44px] w-14 px-1.5 py-0.5 bg-black/40 border border-[color:var(--hairline)] rounded text-[11px] font-mono text-center text-studio-gold focus:outline-none focus:border-[color:var(--hairline-strong)]"
                       />
                     </div>
 
@@ -443,8 +443,8 @@ function GalleryManagerContent() {
         </div>
       ) : (
         /* Reorder Table Mode */
-        <div className="admin-panel overflow-hidden">
-          <table className="w-full text-left text-xs text-zinc-300">
+        <div className="admin-panel overflow-x-auto overscroll-x-contain" role="region" aria-label="Artwork reorder table — scroll horizontally" tabIndex={0}>
+          <table className="min-w-[800px] w-full text-left text-xs text-zinc-300">
             <thead className="bg-black/30 text-[color:var(--ink-muted)] uppercase tracking-wider text-[10px] border-b border-[color:var(--hairline)]">
               <tr>
                 <th className="p-3 w-12 text-center">#</th>
@@ -542,7 +542,7 @@ function GalleryManagerContent() {
       {/* Add Artwork Modal */}
       {isAddingArtwork && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in">
-          <div className="admin-panel relative w-full max-w-lg overflow-hidden p-6 space-y-4">
+          <div className="admin-dialog admin-panel relative w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-[color:var(--hairline)] pb-3">
               <h3 className="font-cinzel font-bold text-lg text-studio-gold">
                 Add Artwork to {selectedGallery}
@@ -568,7 +568,7 @@ function GalleryManagerContent() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="admin-label">Medium</label>
                   <input
@@ -591,7 +591,7 @@ function GalleryManagerContent() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="admin-label">Dimensions</label>
                   <input
@@ -633,7 +633,7 @@ function GalleryManagerContent() {
                 </p>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2">
+              <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setIsAddingArtwork(false)}

@@ -103,7 +103,7 @@ export default function DashboardPage() {
       </section>
 
       {/* Metrics row */}
-      <section className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {metrics.map((m) => {
           const Icon = m.icon;
           return (
@@ -121,7 +121,7 @@ export default function DashboardPage() {
 
       {/* Gallery collections navigator */}
       <section className="space-y-4">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h2 className="admin-title text-xl font-bold">Studio Collections &amp; Galleries</h2>
             <p className="text-xs text-zinc-400 mt-0.5">

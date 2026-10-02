@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { useSite } from '@/context/SiteContext';
 import type { StudioEvent } from '@/lib/types';
+import EventPhotoGallery from '@/components/EventPhotoGallery';
+import { optimizeArtworkImage } from '@/lib/imageOptimize';
 
 /**
  * Suggested event labels. These are only suggestions: the website renders
@@ -67,13 +69,25 @@ function EventForm({
   onSave: () => void;
   onCancel: () => void;
 }) {
-  const imagesText = (value.images || []).join('\n');
+  const { content, tokenOverride } = useSite();
+  const [uploading, setUploading] = useState(false);
+  const uploadPhoto = async (file: File) => {
+    const optimized = await optimizeArtworkImage(file);
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(tokenOverride ? { 'x-github-token': tokenOverride } : {}) },
+      body: JSON.stringify({ fileName: optimized.fileName, base64Data: optimized.base64Payload }),
+    });
+    const result = await response.json();
+    if (!response.ok || !result.src) throw new Error(result.error || 'Photo upload failed.');
+    return result.src as string;
+  };
   const currentType = (value.eventType || '').trim();
   const isCustomType = Boolean(currentType) && !EVENT_TYPE_PRESETS.includes(currentType);
   const typeOptions = isCustomType ? [currentType, ...EVENT_TYPE_PRESETS] : EVENT_TYPE_PRESETS;
 
   return (
-    <div className="admin-panel p-5 sm:p-6 space-y-5">
+    <div className="admin-panel min-w-0 p-4 sm:p-6 space-y-5">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="admin-kicker">{isPast ? 'Past event / exhibition' : 'Upcoming registration event'}</p>
@@ -143,16 +157,17 @@ function EventForm({
           </label>
         )}
 
-        <label className="space-y-1 sm:col-span-2">
-          <span className="admin-label">Event photos (one URL per line)</span>
-          <textarea rows={3} value={imagesText} onChange={(e) => onChange({ images: e.target.value.split(/\n|,/).map((item) => item.trim()).filter(Boolean) })} className="admin-input font-mono text-xs resize-y" placeholder="/images/w1.jpeg\n/images/w6.jpeg" />
-          <span className="text-[11px] text-[color:var(--ink-faint)]">Use photos that are already on the website. The first photo becomes the main event photo.</span>
-        </label>
+        <div className="sm:col-span-2">
+          <EventPhotoGallery images={value.images ?? (value.image ? [value.image] : [])}
+            onChange={(images) => onChange({ images, image: images[0] || '' })}
+            upload={uploadPhoto} onBusy={setUploading}
+            gallery={Object.values(content?.galleries ?? {}).flat().map((item) => ({ src: item.src, title: item.title }))} />
+        </div>
       </div>
 
       <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 pt-2 border-t border-[color:var(--hairline)]">
-        <button type="button" onClick={onCancel} className="admin-btn-ghost px-4 py-2">Cancel</button>
-        <button type="button" onClick={onSave} disabled={!value.title.trim() || !value.date.trim() || !value.description?.trim()} className="admin-btn-gold px-4 py-2 disabled:opacity-50">
+        <button type="button" disabled={uploading} onClick={onCancel} className="admin-btn-ghost px-4 py-2">Cancel</button>
+        <button type="button" onClick={onSave} disabled={uploading || !value.title.trim() || !value.date.trim() || !value.description?.trim()} className="admin-btn-gold px-4 py-2 disabled:opacity-50">
           <Save className="w-4 h-4" /> Save for review
         </button>
       </div>
@@ -165,6 +180,7 @@ export default function EventsPage() {
   const [kind, setKind] = useState<'upcoming' | 'past'>('upcoming');
   const [draft, setDraft] = useState<StudioEvent | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<StudioEvent | null>(null);
 
   const events = useMemo(() => content?.events?.[kind] || [], [content?.events, kind]);
 
@@ -191,12 +207,19 @@ export default function EventsPage() {
   };
 
   const removeEvent = (event: StudioEvent) => {
-    if (!window.confirm(`Remove “${event.title}” from ${kind} events? This is only a pending change and can still be cancelled before publishing.`)) return;
     updateEvents({ [kind]: events.filter((item) => item.id !== event.id) });
+    setDeleteTarget(null);
   };
 
   return (
     <div className="space-y-6">
+      {deleteTarget && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" onClick={() => setDeleteTarget(null)}>
+        <div role="alertdialog" aria-modal="true" aria-label="Remove event" className="admin-dialog admin-panel w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto p-4 sm:p-5 space-y-4 break-words" onClick={(event) => event.stopPropagation()}>
+          <h2 className="admin-title">Remove this event?</h2>
+          <p className="text-sm">“{deleteTarget.title}” will be removed from your draft only. Publish to update the website.</p>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2"><button type="button" autoFocus className="admin-btn-ghost" onClick={() => setDeleteTarget(null)}>Keep event</button><button type="button" className="admin-btn-gold" onClick={() => removeEvent(deleteTarget)}>Remove event</button></div>
+        </div>
+      </div>}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
         <div>
           <p className="admin-kicker">Website events and registration details</p>
@@ -206,7 +229,7 @@ export default function EventsPage() {
         <button onClick={beginCreate} className="admin-btn-gold px-4 py-2.5 self-start lg:self-auto"><Plus className="w-4 h-4" /> Add {kind === 'upcoming' ? 'upcoming event' : 'past event'}</button>
       </div>
 
-      <div className="flex gap-2 border-b border-[color:var(--hairline)] pb-2">
+      <div className="flex flex-wrap gap-2 border-b border-[color:var(--hairline)] pb-2">
         {(['upcoming', 'past'] as const).map((tab) => (
           <button key={tab} onClick={() => { setKind(tab); setDraft(null); }} className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize ${kind === tab ? 'admin-btn-gold' : 'admin-btn-ghost'}`}>
             {tab} ({content.events?.[tab]?.length || 0})
@@ -224,26 +247,26 @@ export default function EventsPage() {
           const expanded = openId === event.id;
           return (
             <article key={event.id} className="admin-card overflow-hidden">
-              <div className="flex items-start gap-3 p-4 sm:p-5">
+              <div className="grid grid-cols-[56px_minmax(0,1fr)] md:grid-cols-[56px_minmax(0,1fr)_auto] items-start gap-3 p-4 sm:p-5">
                 <div className="w-14 h-14 rounded-xl overflow-hidden bg-black/30 border border-[color:var(--hairline)] shrink-0 flex items-center justify-center">
                   {event.images?.[0] || event.image ? <img src={event.images?.[0] || event.image} alt="" className="w-full h-full object-cover" /> : <ImageIcon className="w-5 h-5 text-studio-gold/60" />}
                 </div>
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0 break-words">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="admin-pill admin-pill--gold">{event.eventType || (kind === 'past' ? 'Past event' : 'Event')}</span>
                     <span className="text-[11px] text-[color:var(--ink-muted)]">{event.date}</span>
                   </div>
-                  <h2 className="font-cinzel text-sm sm:text-base text-zinc-100 font-bold mt-1 truncate">{event.title}</h2>
+                  <h2 className="font-cinzel text-sm sm:text-base text-zinc-100 font-bold mt-1 leading-relaxed [overflow-wrap:anywhere]">{event.title}</h2>
                   <p className="text-xs text-[color:var(--ink-muted)] mt-1 line-clamp-2">{event.description}</p>
                   <p className="text-[11px] text-studio-gold mt-2">{event.location || 'Location not set'}{kind === 'upcoming' && event.seatsRemaining !== undefined ? ` · ${event.seatsRemaining} seats left` : ''}</p>
                 </div>
-                <div className="flex items-center gap-1 shrink-0">
-                  <button onClick={() => beginEdit(event)} className="admin-btn-ghost px-2.5 py-2 text-xs">Edit</button>
-                  <button onClick={() => removeEvent(event)} className="p-2 text-zinc-500 hover:text-rose-300" title="Remove event"><Trash2 className="w-4 h-4" /></button>
-                  <button onClick={() => setOpenId(expanded ? null : event.id)} className="p-2 text-zinc-400 hover:text-studio-gold" aria-label="Toggle event details">{expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}</button>
+                <div className="col-span-2 md:col-span-1 flex items-center gap-2 border-t border-[color:var(--hairline)] pt-3 md:border-0 md:pt-0">
+                  <button onClick={() => beginEdit(event)} className="admin-btn-ghost flex-1 md:flex-none px-4 py-2 text-xs" aria-label={`Edit ${event.title}`}>Edit event</button>
+                  <button onClick={() => setDeleteTarget(event)} className="p-2 text-zinc-500 hover:text-rose-300" title="Remove event" aria-label={`Remove ${event.title}`}><Trash2 className="w-4 h-4" /></button>
+                  <button onClick={() => setOpenId(expanded ? null : event.id)} className="p-2 text-zinc-400 hover:text-studio-gold" aria-label={expanded ? 'Hide event details' : 'Show event details'} aria-expanded={expanded}>{expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}</button>
                 </div>
               </div>
-              {expanded && <div className="px-5 pb-5 pt-0 text-xs border-t border-[color:var(--hairline)] grid grid-cols-1 sm:grid-cols-2 gap-2 text-[color:var(--ink-muted)]"><p><b className="text-zinc-200">Deadline:</b> {event.registrationDeadline || 'Not set'}</p><p><b className="text-zinc-200">Registration:</b> {event.registrationUrl || 'WhatsApp / contact channel'}</p><p><b className="text-zinc-200">Photos:</b> {event.images?.length || (event.image ? 1 : 0)}</p><p className="sm:col-span-2"><b className="text-zinc-200">Description:</b> {event.description}</p></div>}
+              {expanded && <div className="px-4 sm:px-5 pb-5 pt-4 text-xs [overflow-wrap:anywhere] border-t border-[color:var(--hairline)] grid grid-cols-1 sm:grid-cols-2 gap-2 text-[color:var(--ink-muted)]"><p><b className="text-zinc-200">Deadline:</b> {event.registrationDeadline || 'Not set'}</p><p><b className="text-zinc-200">Registration:</b> {event.registrationUrl || 'WhatsApp / contact channel'}</p><p><b className="text-zinc-200">Photos:</b> {event.images?.length || (event.image ? 1 : 0)}</p><p className="sm:col-span-2"><b className="text-zinc-200">Description:</b> {event.description}</p></div>}
             </article>
           );
         })}

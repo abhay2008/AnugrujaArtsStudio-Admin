@@ -83,6 +83,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    if (!localSaved && !commitResult) return NextResponse.json({ error: 'Nothing was uploaded: configure GitHub access on this deployment.' }, { status: 500 });
     return NextResponse.json({
       success: true,
       src: `/images/${safeFileName}`,

@@ -31,9 +31,10 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    ".next-buffy/types/**/*.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
-    ".next-buffy/types/**/*.ts"
+    ".next-responsive-admin/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

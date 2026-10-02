@@ -58,15 +58,15 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in">
-      <div className="admin-panel relative w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="admin-dialog admin-panel relative w-full min-w-0 max-w-2xl overflow-hidden flex flex-col max-h-[calc(100dvh-2rem)]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[color:var(--hairline)] bg-black/25">
-          <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-studio-gold/20 text-studio-gold">
+        <div className="flex shrink-0 items-start justify-between gap-2 px-4 sm:px-6 py-4 border-b border-[color:var(--hairline)] bg-black/25">
+          <div className="flex min-w-0 items-start gap-2">
+            <div className="hidden sm:block shrink-0 p-2 rounded-lg bg-studio-gold/20 text-studio-gold">
               <UploadCloud className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-cinzel font-bold text-lg text-studio-gold">
+              <h3 className="font-cinzel font-bold text-base sm:text-lg text-studio-gold">
                 Review & Publish Changes
               </h3>
               <p className="text-xs text-[color:var(--ink-muted)]">
@@ -77,14 +77,15 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
           <button
             onClick={onClose}
             disabled={saving}
-            className="p-1.5 rounded-lg text-[color:var(--ink-faint)] hover:text-studio-gold hover:bg-white/10 transition-colors"
+            aria-label="Close publish review"
+            className="shrink-0 p-1.5 rounded-lg text-[color:var(--ink-faint)] hover:text-studio-gold hover:bg-white/10 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content Body */}
-        <div className="p-6 overflow-y-auto space-y-6 flex-1 text-sm">
+        <div className="min-h-0 p-4 sm:p-6 overflow-y-auto overscroll-contain space-y-6 flex-1 text-sm break-words">
           {/* Staged Uploaded Images */}
           {stagedImages.length > 0 && (
             <div className="space-y-3">
@@ -175,13 +176,13 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
           {commitStatus === 'success' && (
             <div className="flex items-center gap-2 p-3 bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 rounded-xl text-xs">
               <CheckCircle className="w-4 h-4 flex-none" />
-              <span>Website updated successfully. Your new information is now live.</span>
+              <span>Changes committed to GitHub repository main branch. The website deployment will pick them up shortly.</span>
             </div>
           )}
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-[color:var(--hairline)] bg-black/20">
+        <div className="flex shrink-0 flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2 px-4 sm:px-6 py-4 border-t border-[color:var(--hairline)] bg-black/20">
           <button
             type="button"
             onClick={onClose}
@@ -194,7 +195,7 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
             type="button"
             onClick={handleCommit}
             disabled={saving || (dirtyCount === 0 && stagedImages.length === 0)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-studio-gold via-amber-300 to-studio-gold text-studio-purple-dark shadow-lg hover:shadow-[0_0_20px_rgba(242,215,112,0.5)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-studio-gold via-amber-300 to-studio-gold text-studio-purple-dark shadow-lg hover:shadow-[0_0_20px_rgba(242,215,112,0.5)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
             {saving ? (
               <>

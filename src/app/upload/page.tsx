@@ -247,7 +247,7 @@ export default function MassUploadPage() {
       {/* Processed Queue */}
       {stagedQueue.length > 0 && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <h2 className="font-cinzel text-base font-bold text-studio-gold">
               Ready for Review ({stagedQueue.length} photo{stagedQueue.length === 1 ? '' : 's'})
             </h2>
@@ -271,7 +271,7 @@ export default function MassUploadPage() {
                   key={item.id}
                   className="admin-card p-4 space-y-3 flex flex-col justify-between"
                 >
-                  <div className="flex gap-4">
+                  <div className="flex flex-col sm:flex-row gap-4">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={item.previewUrl}
@@ -366,7 +366,7 @@ export default function MassUploadPage() {
                   </div>
 
                   <div className="flex items-center justify-between pt-2 border-t border-[color:var(--hairline)] text-xs">
-                    <span className="text-[11px] text-studio-gold truncate">{item.name}</span>
+                    <span className="text-[11px] text-studio-gold min-w-0 truncate">{item.name}</span>
                     <button
                       onClick={() => removeItem(item.id)}
                       className="text-zinc-500 hover:text-rose-400 p-1 transition-colors"
