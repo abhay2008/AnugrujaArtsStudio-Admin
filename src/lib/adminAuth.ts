@@ -21,10 +21,39 @@ function getExpectedPassword(): string {
   return password;
 }
 
-export function checkAdminPassword(provided: string): boolean {
-  if (!provided) return false;
+/**
+ * Constant-time equality: compares two byte arrays without leaking where they
+ * first differ. Used instead of `===` so a wrong password cannot be narrowed
+ * down by timing the server's response.
+ */
+function constantTimeEqual(a: Uint8Array, b: Uint8Array): boolean {
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i += 1) {
+    mismatch |= a[i] ^ b[i];
+  }
+  return mismatch === 0;
+}
+
+async function sha256Bytes(text: string): Promise<Uint8Array> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return new Uint8Array(digest);
+}
+
+/**
+ * Verify the studio password. Digests both sides with SHA-256 and compares them
+ * in constant time (Web Crypto only — this module is also bundled into the Edge
+ * middleware, where Node's `crypto` is unavailable). Fails closed when
+ * ADMIN_PASSWORD is unset.
+ */
+export async function checkAdminPassword(provided: unknown): Promise<boolean> {
+  if (typeof provided !== 'string' || !provided) return false;
   try {
-    return provided === getExpectedPassword();
+    const [expected, received] = await Promise.all([
+      sha256Bytes(getExpectedPassword()),
+      sha256Bytes(provided.trim()),
+    ]);
+    return constantTimeEqual(expected, received);
   } catch {
     return false; // ADMIN_PASSWORD unconfigured — reject all attempts
   }

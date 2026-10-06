@@ -11,10 +11,16 @@ async function runTests() {
   if (!adminPass) {
     throw new Error('ADMIN_PASSWORD not set — export it from .env.local before running this suite.');
   }
-  const validPass = checkAdminPassword(adminPass);
-  const invalidPass = checkAdminPassword('wrongpassword');
+  const validPass = await checkAdminPassword(adminPass);
+  const invalidPass = await checkAdminPassword('wrongpassword');
+  // Mobile keyboards pad passwords with spaces, so trimming is deliberate;
+  // a genuinely wrong password must still be rejected.
+  const whitespacePaddedPass = await checkAdminPassword(`  ${adminPass}  `);
+  const truncatedPass = await checkAdminPassword(adminPass.slice(0, -1));
   console.log(`[AUTH] Correct password check: ${validPass ? 'PASS' : 'FAIL'}`);
   console.log(`[AUTH] Wrong password rejection: ${!invalidPass ? 'PASS' : 'FAIL'}`);
+  console.log(`[AUTH] Whitespace-padded password accepted (trim): ${whitespacePaddedPass ? 'PASS' : 'FAIL'}`);
+  console.log(`[AUTH] Near-miss password rejected: ${!truncatedPass ? 'PASS' : 'FAIL'}`);
 
   const token = await createSessionToken('admin-user');
   console.log(`[AUTH] Generated HMAC session token (len=${token.length})`);
@@ -23,7 +29,14 @@ async function runTests() {
   console.log(`[AUTH] Valid token verification: ${tokenValid ? 'PASS' : 'FAIL'}`);
   console.log(`[AUTH] Bogus token rejection: ${!bogusTokenValid ? 'PASS' : 'FAIL'}`);
 
-  if (!validPass || invalidPass || !tokenValid || bogusTokenValid) {
+  if (
+    !validPass ||
+    invalidPass ||
+    !whitespacePaddedPass ||
+    truncatedPass ||
+    !tokenValid ||
+    bogusTokenValid
+  ) {
     throw new Error('Test 1 Failed');
   }
 

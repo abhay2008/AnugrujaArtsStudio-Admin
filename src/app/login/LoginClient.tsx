@@ -59,8 +59,10 @@ export default function LoginClient() {
 
         {/* Brand crest */}
         <div className="text-center space-y-3 mb-8">
-          {/* The studio's real logo crest (previously a plain "A" letter). */}
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-[linear-gradient(150deg,#f7e494_0%,#d4af37_55%,#8a6410_100%)] overflow-hidden flex items-center justify-center shadow-[0_12px_30px_-10px_rgba(212,175,55,0.7),inset_0_1px_0_rgba(255,255,255,0.6)] ring-1 ring-amber-200/40">
+          {/* The studio's real logo crest (previously a plain "A" letter).
+              The crest artwork is a transparent PNG: it needs a dark plate
+              behind it, or the gold-on-gold gradient swallows the mark. */}
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-black overflow-hidden flex items-center justify-center shadow-[0_12px_30px_-10px_rgba(212,175,55,0.7),inset_0_1px_0_rgba(255,255,255,0.06)] ring-1 ring-amber-200/40">
             {/* eslint-disable-next-line @next/next/no-img-element -- static local asset; next/image adds nothing here */}
             <img src="/images/logo.png" alt="Anugruja Arts Studio logo" className="h-full w-full object-contain p-1.5" />
           </div>
