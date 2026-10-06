@@ -8,7 +8,7 @@ Built with **Next.js + TypeScript**, deployed on **Vercel**. No database, no ser
 
 ## 🌟 Key Capabilities
 
-- 🔐 **Secure session auth** — server-side password check → **HMAC-SHA256-signed session cookie** (24 h). Every page and `/api/*` route is gated by `src/middleware.ts` (401 for API calls, redirect for pages), and the check fails closed when `ADMIN_PASSWORD` is unset. There is **no built-in login rate limit** — put the portal behind your host's edge protection (e.g. a Vercel firewall rule) if it is ever exposed publicly.
+- 🔐 **Secure session auth** — server-side password check → **HMAC-SHA256-signed session cookie** (24 h). Every page and `/api/*` route is gated by `src/middleware.ts` (401 for API calls, redirect for pages), and the check fails closed when `ADMIN_PASSWORD` is unset. The password is compared in **constant time** (SHA-256 digests, so no early exit leaks how much of a guess was right), and sign-in is **throttled per client**: five failures and that client waits 15 minutes before trying again. On multi-instance serverless that throttle is a per-instance speed bump rather than a hard limit, so keep the portal behind your host's edge protection too.
 - 🖼️ **Gallery management** — inline editing, reorder, move-between-collections, slot jumping, grid/table views across the site's typed collections.
 - 📸 **Mass Upload Studio** — client-side image compression before staging, smart collection mapping (auto-suggested from filenames, overridable per image), and adaptive metadata: price/status fields appear **only** for sellable collections, never for showcase art.
 - 💰 **Price privacy** — saving a price stamps it `priceConfirmedAt` automatically, and only then does the public site show the figure; until that moment visitors see **XXXX** with a *"contact the studio for the actual cost"* note (this portal's editors always see the real numbers).
@@ -114,7 +114,7 @@ npm run build        # production build
 set -a; . ./.env.local; set +a; npm run verify
 ```
 
-It checks that the correct password is accepted and a wrong one rejected, that issued session tokens verify while forged ones do not, that the content mirror loads with 8 galleries and a non-empty Art for Sale collection, and that both `GITHUB_REPO` targets resolve.
+It checks that the correct password is accepted (whitespace padding included) and a wrong one — even a near miss — rejected, that issued session tokens verify while forged ones do not, that the content mirror loads with 8 galleries and a non-empty Art for Sale collection, and that both `GITHUB_REPO` targets resolve.
 
 To publish from a **local** portal you need `GITHUB_TOKEN` set in `.env.local` — without it the portal can still read content (via its mirror) but publishing reaches GitHub unauthenticated, so nothing is committed and the portal will tell you so. `DEVELOPMENT_LOCAL_SAVE=true` mirrors saves to the sibling public checkout on disk, which is enough for local content work but does not update the live site.
 
