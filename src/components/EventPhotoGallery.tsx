@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Images, Loader2, Trash2, Upload, X } from 'lucide-react';
+import { cacheClientImage } from '@/lib/clientImageCache';
 
 type Photo = { src: string; title: string };
 interface Props {
@@ -47,6 +48,7 @@ export default function EventPhotoGallery({ images, onChange, upload, gallery, o
         setStatus(`Optimizing and uploading photo ${uploaded + 1} of ${files.length}…`);
         const src = await upload(file);
         previews.current[src] = URL.createObjectURL(file);
+        void cacheClientImage(src, previews.current[src], file.type);
         change([...current.current, src]);
         uploaded++;
       }

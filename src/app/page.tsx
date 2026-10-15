@@ -14,6 +14,7 @@ import {
 import { useSite } from '@/context/SiteContext';
 import { GALLERIES_META } from '@/data/galleriesData';
 import { GalleryKey } from '@/lib/types';
+import ArtworkThumbnail from '@/components/ArtworkThumbnail';
 
 export default function DashboardPage() {
   const { content, loading, setActiveGallery } = useSite();
@@ -149,13 +150,14 @@ export default function DashboardPage() {
               >
                 {/* Artwork thumbnail */}
                 <div className="relative h-32 w-full bg-studio-dark/80 overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <ArtworkThumbnail
                     src={firstImg}
                     alt={meta.label}
+                    versionKey={list[0]?.dateAdded || list[0]?.id || content?.lastUpdated}
+                    aspect="cover"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-85"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#200e2a] via-[#200e2a]/40 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#200e2a] via-[#200e2a]/40 to-transparent pointer-events-none" />
                   <span className="admin-pill admin-pill--gold absolute bottom-2 right-2 !bg-[#14081a]/85">
                     {list.length} artworks
                   </span>

@@ -13,6 +13,7 @@ import {
   SocialLink,
   galleryCatalogEntry,
 } from '@/lib/types';
+import { cacheClientImage, preloadClientImageCache } from '@/lib/clientImageCache';
 
 /**
  * CMS domains the "Review & Publish" counter watches, whole-object.
@@ -84,6 +85,13 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
       const savedToken = localStorage.getItem('anugruja_github_token');
       if (savedToken) {
         setTokenOverrideState(savedToken);
+      }
+      // Hydrate client-side browser image cache from IndexedDB
+      preloadClientImageCache().catch(() => {});
+
+      // Register image caching Service Worker if supported
+      if ('serviceWorker' in navigator && window.isSecureContext) {
+        navigator.serviceWorker.register('/admin-image-cache-sw.js').catch(() => {});
       }
     }
   }, []);
@@ -389,6 +397,13 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
         }
 
         const uploaded = await uploadRes.json();
+
+        // Cache in browser client image cache for immediate 0ms rendering
+        if (img.previewUrl || img.base64Data) {
+          const dataUrl = img.previewUrl || `data:image/webp;base64,${img.base64Data}`;
+          await cacheClientImage(uploaded.src, dataUrl);
+        }
+
         const destEntry = galleryCatalogEntry(img.targetGallery);
         const isSale = destEntry.sellable;
         const newArtwork: Artwork = {

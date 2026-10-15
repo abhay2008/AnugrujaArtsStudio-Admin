@@ -2,6 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { commitBinaryFile, githubConfigured } from '@/lib/github';
+import { cacheImageInMemory, saveImageToTmp } from '@/lib/imageCache';
+
+const MIME_BY_EXT: Record<string, string> = {
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.png': 'image/png',
+  '.webp': 'image/webp',
+  '.gif': 'image/gif',
+  '.svg': 'image/svg+xml',
+  '.avif': 'image/avif',
+  '.ico': 'image/x-icon',
+};
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,6 +40,13 @@ export async function POST(req: NextRequest) {
     if (!safeFileName || safeFileName === '.' || safeFileName === '..') {
       return NextResponse.json({ error: 'Invalid image filename' }, { status: 400 });
     }
+
+    const ext = path.extname(safeFileName).toLowerCase();
+    const mimeType = MIME_BY_EXT[ext] || 'image/jpeg';
+
+    // 0. Cache immediately in memory and in writable serverless tmp directory
+    cacheImageInMemory(safeFileName, buffer, mimeType);
+    const tmpSaved = saveImageToTmp(safeFileName, buffer);
 
     // 1. Save to local admin public/images/ (best-effort — read-only on serverless)
     const localTarget = path.join(process.cwd(), 'public', 'images', safeFileName);
@@ -83,13 +102,20 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (!localSaved && !commitResult) return NextResponse.json({ error: 'Nothing was uploaded: configure GitHub access on this deployment.' }, { status: 500 });
+    if (!localSaved && !commitResult && !tmpSaved) {
+      return NextResponse.json({ error: 'Nothing was uploaded: configure GitHub access on this deployment.' }, { status: 500 });
+    }
+
+    const cacheBuster = Date.now();
     return NextResponse.json({
       success: true,
       src: `/images/${safeFileName}`,
+      url: `/images/${safeFileName}?t=${cacheBuster}`,
       fileName: safeFileName,
+      cacheBuster,
       sizeBytes: buffer.length,
       localSaved,
+      tmpSaved,
       commitResult,
     });
   } catch (err: any) {

@@ -11,6 +11,7 @@ import {
 import { useSite } from '@/context/SiteContext';
 import { GALLERY_CATALOG, ArtworkStatus, GalleryKey, StagedImage, galleryCatalogEntry, suggestGalleryFromFilename } from '@/lib/types';
 import { optimizeArtworkImage } from '@/lib/imageOptimize';
+import { cacheClientImage } from '@/lib/clientImageCache';
 
 interface LocalStagingItem {
   id: string;
@@ -132,6 +133,10 @@ export default function MassUploadPage() {
     if (stagedQueue.length === 0) return;
 
     stagedQueue.forEach((item) => {
+      if (item.previewUrl) {
+        void cacheClientImage(`/images/${item.name}`, item.previewUrl);
+        void cacheClientImage(item.name, item.previewUrl);
+      }
       stageUploadedImage({
         id: item.id,
         name: item.name,

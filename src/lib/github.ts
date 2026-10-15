@@ -271,6 +271,57 @@ export async function getRemoteTextFile(
   return null;
 }
 
+export async function getRemoteBinaryFile(
+  filePath: string,
+  tokenOverride?: string
+): Promise<Buffer | null> {
+  if (!githubConfigured(tokenOverride)) return null;
+  const cleanPath = filePath.replace(/^\/+/, '');
+  const encodedPath = cleanPath
+    .split('/')
+    .map(encodeURIComponent)
+    .join('/');
+
+  for (const repoName of publishRepos()) {
+    const contentsUrl = `/repos/${owner()}/${repoName}/contents/${encodedPath}?ref=${encodeURIComponent(branch())}&_t=${Date.now()}`;
+    try {
+      const res = await githubFetch(contentsUrl, {}, tokenOverride);
+      if (!res.ok) continue;
+      const json = (await res.json()) as { content?: string; encoding?: string; download_url?: string };
+      if (json.content && json.encoding === 'base64') {
+        return Buffer.from(json.content.replace(/\s+/g, ''), 'base64');
+      }
+      if (json.download_url) {
+        const rawRes = await fetch(json.download_url, { cache: 'no-store' });
+        if (rawRes.ok) {
+          const ab = await rawRes.arrayBuffer();
+          return Buffer.from(ab);
+        }
+      }
+    } catch {
+      /* continue */
+    }
+  }
+
+  // Raw githubusercontent fallback if contents API didn't resolve
+  for (const repoName of publishRepos()) {
+    try {
+      const rawUrl = `https://raw.githubusercontent.com/${owner()}/${repoName}/${branch()}/${cleanPath}`;
+      const activeTok = token(tokenOverride);
+      const headers: Record<string, string> = activeTok ? { Authorization: `token ${activeTok}` } : {};
+      const rawRes = await fetch(rawUrl, { headers, cache: 'no-store' });
+      if (rawRes.ok) {
+        const ab = await rawRes.arrayBuffer();
+        return Buffer.from(ab);
+      }
+    } catch {
+      /* continue */
+    }
+  }
+
+  return null;
+}
+
 export async function getLatestCommit(tokenOverride?: string) {
   if (!githubConfigured(tokenOverride)) return null;
   const res = await githubFetch(

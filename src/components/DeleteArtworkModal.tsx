@@ -3,6 +3,7 @@
 import React from 'react';
 import { AlertTriangle, Trash2, X } from 'lucide-react';
 import { Artwork, GalleryKey } from '@/lib/types';
+import ArtworkThumbnail from '@/components/ArtworkThumbnail';
 
 interface DeleteArtworkModalProps {
   artwork: Artwork | null;
@@ -45,12 +46,15 @@ export default function DeleteArtworkModal({
 
         {/* Artwork Summary */}
         <div className="flex items-center gap-3 p-3 bg-black/25 rounded-xl border border-[color:var(--hairline)]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={artwork.src}
-            alt={artwork.title}
-            className="w-16 h-16 object-cover rounded-lg border border-[color:var(--hairline-strong)] flex-none"
-          />
+          <div className="w-16 h-16 rounded-lg overflow-hidden border border-[color:var(--hairline-strong)] flex-none">
+            <ArtworkThumbnail
+              src={artwork.src}
+              alt={artwork.title}
+              versionKey={artwork.dateAdded || artwork.id}
+              aspect="cover"
+              className="w-full h-full object-cover"
+            />
+          </div>
           <div className="min-w-0 flex-1">
             <p className="font-medium text-sm text-zinc-100 truncate">{artwork.title}</p>
             <p className="text-xs text-studio-gold truncate">

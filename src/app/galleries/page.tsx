@@ -18,11 +18,18 @@ import {
   ExternalLink,
   Sparkles,
   ShoppingBag,
+  UploadCloud,
+  Loader2,
+  Camera,
+  RotateCw,
 } from 'lucide-react';
 import { useSite } from '@/context/SiteContext';
 import { GALLERIES_META } from '@/data/galleriesData';
 import { ArtworkStatus, GalleryKey, Artwork, galleryCatalogEntry } from '@/lib/types';
 import DeleteArtworkModal from '@/components/DeleteArtworkModal';
+import ArtworkThumbnail from '@/components/ArtworkThumbnail';
+import { optimizeArtworkImage } from '@/lib/imageOptimize';
+import { cacheClientImage } from '@/lib/clientImageCache';
 
 function GalleryManagerContent() {
   const searchParams = useSearchParams();
@@ -37,6 +44,7 @@ function GalleryManagerContent() {
     deleteArtwork,
     moveArtwork,
     addArtwork,
+    tokenOverride,
   } = useSite();
 
   const [selectedGallery, setSelectedGallery] = useState<GalleryKey>(initialGallery);
@@ -56,6 +64,8 @@ function GalleryManagerContent() {
   const [newArtCategory, setNewArtCategory] = useState('');
   const [newArtSrc, setNewArtSrc] = useState('/images/banner.jpeg');
   const [newArtStatus, setNewArtStatus] = useState<ArtworkStatus | ''>('');
+  const [newArtUploading, setNewArtUploading] = useState(false);
+  const [newArtPreview, setNewArtPreview] = useState<string>('');
 
   // Editing in-place state
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -63,6 +73,8 @@ function GalleryManagerContent() {
   const [editPrice, setEditPrice] = useState('');
   const [editMedium, setEditMedium] = useState('');
   const [editStatus, setEditStatus] = useState<ArtworkStatus | ''>('');
+  const [editSrc, setEditSrc] = useState('');
+  const [editUploading, setEditUploading] = useState(false);
 
   const galleryList = content?.galleries[selectedGallery] || [];
 
@@ -88,6 +100,41 @@ function GalleryManagerContent() {
     setEditPrice(art.price !== undefined ? String(art.price) : '');
     setEditMedium(art.medium || '');
     setEditStatus(art.status || '');
+    setEditSrc(art.src || '');
+  };
+
+  const handleReplacePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setEditUploading(true);
+    try {
+      const optimized = await optimizeArtworkImage(file, 1600, 0.82);
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(tokenOverride ? { 'x-github-token': tokenOverride } : {}),
+        },
+        body: JSON.stringify({
+          fileName: optimized.fileName,
+          base64Data: optimized.base64Payload,
+          message: `Replace photo for artwork ${editingId} in ${selectedGallery}`,
+          tokenOverride,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.src) {
+          setEditSrc(data.src);
+          await cacheClientImage(data.src, optimized.dataUrl, optimized.mimeType);
+        }
+      }
+    } catch (err) {
+      console.error('Failed replacing photo:', err);
+    } finally {
+      setEditUploading(false);
+    }
   };
 
   const handleSaveEdit = (id: string) => {
@@ -98,16 +145,67 @@ function GalleryManagerContent() {
       price: selectedMeta.sellable && editPrice ? editPrice : undefined,
       medium: editMedium || undefined,
       status: selectedMeta.sellable && editStatus ? editStatus : undefined,
+      src: editSrc || undefined,
+      dateAdded: new Date().toISOString(),
     });
     setEditingId(null);
   };
 
+  const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setNewArtUploading(true);
+    try {
+      const optimized = await optimizeArtworkImage(file, 1600, 0.82);
+      setNewArtPreview(optimized.dataUrl);
+
+      // Auto-populate title if empty
+      if (!newArtTitle) {
+        const cleanName = file.name
+          .replace(/\.[^/.]+$/, '')
+          .replace(/[_-]+/g, ' ')
+          .replace(/\b\w/g, (c) => c.toUpperCase());
+        setNewArtTitle(cleanName);
+      }
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(tokenOverride ? { 'x-github-token': tokenOverride } : {}),
+        },
+        body: JSON.stringify({
+          fileName: optimized.fileName,
+          base64Data: optimized.base64Payload,
+          message: `Upload ${newArtTitle || file.name} photo for ${selectedGallery}`,
+          tokenOverride,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.src) {
+          setNewArtSrc(data.src);
+          await cacheClientImage(data.src, optimized.dataUrl, optimized.mimeType);
+        }
+      }
+    } catch (err) {
+      console.error('Failed uploading artwork photo:', err);
+    } finally {
+      setNewArtUploading(false);
+    }
+  };
+
   const handleCreateArtwork = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newArtTitle) return;
+    if (!newArtTitle || newArtUploading) return;
+
+    if (newArtPreview && newArtSrc) {
+      void cacheClientImage(newArtSrc, newArtPreview);
+    }
 
     const newArt: Artwork = {
-      id: `art-${Date.now()}`,
+      id: `art-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       title: newArtTitle,
       category: newArtCategory || selectedMeta.defaultCategory,
       medium: newArtMedium || undefined,
@@ -115,12 +213,20 @@ function GalleryManagerContent() {
       dimensions: newArtDimensions || undefined,
       src: newArtSrc,
       status: selectedMeta.sellable && newArtStatus ? newArtStatus : undefined,
+      dateAdded: new Date().toISOString(),
     };
 
     addArtwork(selectedGallery, newArt);
     setIsAddingArtwork(false);
     // Reset form
     setNewArtTitle('');
+    setNewArtMedium('');
+    setNewArtPrice('');
+    setNewArtDimensions('');
+    setNewArtCategory('');
+    setNewArtSrc('/images/banner.jpeg');
+    setNewArtStatus('');
+    setNewArtPreview('');
   };
 
   if (loading || !content) {
@@ -265,10 +371,10 @@ function GalleryManagerContent() {
               >
                 {/* Artwork Thumbnail */}
                 <div className="relative h-48 w-full bg-black/40 overflow-hidden flex items-center justify-center border-b border-[color:var(--hairline)]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <ArtworkThumbnail
                     src={art.src}
                     alt={art.title}
+                    versionKey={art.dateAdded || art.id || content?.lastUpdated}
                     className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
                   />
                   {/* Position Badge */}
@@ -328,6 +434,28 @@ function GalleryManagerContent() {
                           <option value="Reserved">Reserved</option>
                         </select>
                       )}
+
+                      {/* Replace photo control */}
+                      <label className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-black/40 border border-studio-gold/30 hover:border-studio-gold/60 text-[11px] text-studio-gold cursor-pointer transition-colors">
+                        {editUploading ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            <span>Uploading photo...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Camera className="w-3.5 h-3.5" />
+                            <span>{editSrc && editSrc !== art.src ? 'New photo attached' : 'Replace photo'}</span>
+                          </>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          disabled={editUploading}
+                          onChange={handleReplacePhoto}
+                          className="hidden"
+                        />
+                      </label>
 
                       <div className="flex items-center gap-2 pt-1">
                         <button
@@ -463,12 +591,15 @@ function GalleryManagerContent() {
                     {idx + 1}
                   </td>
                   <td className="p-3">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={art.src}
-                      alt={art.title}
-                      className="w-10 h-10 object-cover rounded-lg border border-[color:var(--hairline-strong)]"
-                    />
+                    <div className="w-10 h-10 rounded-lg overflow-hidden border border-[color:var(--hairline-strong)]">
+                      <ArtworkThumbnail
+                        src={art.src}
+                        alt={art.title}
+                        versionKey={art.dateAdded || art.id || content?.lastUpdated}
+                        aspect="cover"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   </td>
                   <td className="p-3">
                     <p className="font-semibold text-zinc-100">{art.title}</p>
@@ -619,18 +750,86 @@ function GalleryManagerContent() {
                 )}
               </div>
 
-              <div className="space-y-1">
-                <label className="admin-label">Photo location (optional)</label>
-                <input
-                  type="text"
-                  value={newArtSrc}
-                  onChange={(e) => setNewArtSrc(e.target.value)}
-                  placeholder="e.g. /images/p1.jpeg"
-                  className="admin-input font-mono text-xs"
-                />
-                <p className="text-[11px] text-[color:var(--ink-faint)]">
-                  Tip: Use Add New Work to choose photos directly from your phone or computer.
-                </p>
+              {/* Photo Upload & Preview */}
+              <div className="space-y-2">
+                <label className="admin-label">Artwork Photo *</label>
+
+                {newArtPreview || (newArtSrc && newArtSrc !== '/images/banner.jpeg') ? (
+                  <div className="flex items-center gap-3 p-2.5 rounded-xl bg-black/40 border border-studio-gold/30">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-black/60 border border-studio-gold/20 shrink-0 flex items-center justify-center">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={newArtPreview || newArtSrc}
+                        alt="Preview"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <p className="text-xs font-semibold text-emerald-400 flex items-center gap-1">
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Photo attached &amp; ready</span>
+                      </p>
+                      <p className="text-[10px] text-zinc-400 font-mono truncate">{newArtSrc}</p>
+                      <label className="inline-block text-[11px] text-studio-gold hover:underline cursor-pointer">
+                        <span>Change photo</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          disabled={newArtUploading}
+                          onChange={handlePhotoSelect}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center border-2 border-dashed border-studio-gold/30 hover:border-studio-gold/70 rounded-xl p-4 text-center cursor-pointer bg-black/20 hover:bg-black/30 transition-all group">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={newArtUploading}
+                      onChange={handlePhotoSelect}
+                      className="hidden"
+                    />
+                    {newArtUploading ? (
+                      <div className="flex items-center gap-2 text-studio-gold py-2">
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <span className="text-xs font-medium">Preparing &amp; uploading photo...</span>
+                      </div>
+                    ) : (
+                      <div className="space-y-1 py-1">
+                        <div className="w-8 h-8 mx-auto rounded-lg bg-studio-gold/10 border border-studio-gold/30 flex items-center justify-center text-studio-gold group-hover:scale-105 transition-transform">
+                          <UploadCloud className="w-4 h-4" />
+                        </div>
+                        <p className="text-xs font-semibold text-zinc-200">
+                          Click to choose a photo from your device
+                        </p>
+                        <p className="text-[10px] text-[color:var(--ink-muted)]">
+                          Automatically prepared for fast loading
+                        </p>
+                      </div>
+                    )}
+                  </label>
+                )}
+
+                {/* Optional Manual Location Input */}
+                <div className="pt-1">
+                  <div className="flex items-center justify-between text-[10px] text-[color:var(--ink-muted)]">
+                    <span>Or specify image path manually:</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={newArtSrc}
+                    onChange={(e) => {
+                      setNewArtSrc(e.target.value);
+                      if (e.target.value && !e.target.value.startsWith('data:')) {
+                        setNewArtPreview('');
+                      }
+                    }}
+                    placeholder="e.g. /images/p1.jpeg"
+                    className="admin-input font-mono text-[11px] mt-1"
+                  />
+                </div>
               </div>
 
               <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 pt-2">
@@ -643,9 +842,17 @@ function GalleryManagerContent() {
                 </button>
                 <button
                   type="submit"
-                  className="admin-btn-gold px-5 py-2"
+                  disabled={newArtUploading}
+                  className="admin-btn-gold px-5 py-2 disabled:opacity-50 flex items-center gap-2"
                 >
-                  Add to Collection
+                  {newArtUploading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Uploading Photo...</span>
+                    </>
+                  ) : (
+                    <span>Add to Collection</span>
+                  )}
                 </button>
               </div>
             </form>

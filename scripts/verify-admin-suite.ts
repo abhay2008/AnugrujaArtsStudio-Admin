@@ -64,7 +64,28 @@ async function runTests() {
   }
   console.log('[GITHUB] Multi-repo target validation: PASS');
 
-  console.log('\n🎉 ALL 3 VERIFICATION SUITES PASSED SUCCESSFULLY!');
+  // Test 4: Image In-Memory Caching & Cache-Busting Resolution
+  console.log('\n--- Test 4: Image In-Memory Caching & Cache-Busting ---');
+  const { cacheImageInMemory, getImageFromMemory, saveImageToTmp, getImageFromTmp } = await import('../src/lib/imageCache');
+  const { getAdminImageUrl } = await import('../src/lib/urlUtils');
+  const dummyBuf = Buffer.from('TEST_IMAGE_BUFFER_DATA');
+  cacheImageInMemory('test-art.webp', dummyBuf, 'image/webp');
+  const memCached = getImageFromMemory('test-art.webp');
+  if (!memCached || memCached.buffer.toString() !== 'TEST_IMAGE_BUFFER_DATA') {
+    throw new Error('Test 4 Failed: in-memory image cache mismatch');
+  }
+  saveImageToTmp('test-tmp.webp', dummyBuf);
+  const tmpCached = getImageFromTmp('test-tmp.webp');
+  if (!tmpCached || tmpCached.toString() !== 'TEST_IMAGE_BUFFER_DATA') {
+    throw new Error('Test 4 Failed: /tmp image cache mismatch');
+  }
+  const bustedUrl = getAdminImageUrl('/images/art.webp', 'version-1', 123456789, 1);
+  if (!bustedUrl.includes('t=123456789') || !bustedUrl.includes('r=1')) {
+    throw new Error('Test 4 Failed: cache-busting query parameter mismatch');
+  }
+  console.log('[IMAGE] In-memory cache, /tmp persistence, & cache-busting: PASS');
+
+  console.log('\n🎉 ALL 4 VERIFICATION SUITES PASSED SUCCESSFULLY!');
 }
 
 runTests().catch((err) => {
