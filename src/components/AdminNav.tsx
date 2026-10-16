@@ -43,7 +43,7 @@ const NAV_ITEMS = [
   { href: '/', label: 'Home', full: 'Studio home', icon: LayoutDashboard },
   { href: '/galleries', label: 'Paintings', full: 'Paintings & collections', icon: Images },
   { href: '/upload', label: 'Upload', full: 'Add new work', icon: UploadCloud },
-  { href: '/content', label: 'Studio Details', full: 'Studio details', icon: FileText },
+  { href: '/content', label: 'Art Studio Details', full: 'Art Studio details', icon: FileText },
   { href: '/events', label: 'Events', full: 'Events & workshops', icon: CalendarDays },
 ];
 

@@ -147,7 +147,7 @@ export default function ReviewChangesModal({ isOpen, onClose }: ReviewChangesMod
               Before you publish
             </div>
             <div className="p-3.5 rounded-xl bg-black/25 border border-[color:var(--hairline)] text-xs text-[color:var(--ink)] space-y-2">
-              <p>These changes will update the public website, including the gallery, event information, and studio details you edited.</p>
+              <p>These changes will update the public website, including the gallery, event information, and art studio details you edited.</p>
               <p className="text-[color:var(--ink-muted)]">You can remove any photo above before publishing. After publishing, the website assistant will also learn the new information automatically.</p>
             </div>
           </div>

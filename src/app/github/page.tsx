@@ -21,7 +21,7 @@ export default function PublishingInfoPage() {
           <div>
             <h2 className="font-cinzel text-lg font-bold text-white">Nothing extra is needed here</h2>
             <p className="text-xs text-[color:var(--ink-muted)] mt-1 leading-relaxed">
-              Edit your paintings, events, photos, and studio details in the sections above. When you choose
+              Edit your paintings, events, photos, and art studio details in the sections above. When you choose
               <strong className="text-studio-gold"> Review &amp; Publish</strong>, the public website is updated for you.
             </p>
           </div>
