@@ -195,3 +195,7 @@ AnugrujaArtsStudio-Admin/
 ```
 
 Refer to [ADMIN_USER_GUIDE.md](./ADMIN_USER_GUIDE.md) for day-to-day usage.
+
+## Developer
+
+**Abhay Kashyap** — Undergraduate in Electronics & Communication Engineering (ECE), B.M.S. College of Engineering (BMSCE).
